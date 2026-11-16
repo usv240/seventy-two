@@ -1,0 +1,82 @@
+<!-- page {"title": "Ops: how Seventy-Two is running right now | Seventy-Two", "description": "Live numbers behind Seventy-Two from CloudWatch and X-Ray: every read, every Claude call and its cost, how fast new windows reach saved trips, how close each clock closes to its deadline, and the scale tests.", "nav": "ops", "scripts": ["/assets/ops.js"]} -->
+<main id="main" class="ops">
+  <section class="app-top">
+    <div class="wrap split">
+      <div class="span-7">
+        <h1 class="page-title">Ops</h1>
+        <p class="lead">How Seventy-Two is running right now. These are the stack's own numbers, read from CloudWatch and X-Ray at most every 10 minutes. They include the drills and scale tests below. Nothing here is about a visitor.</p>
+      </div>
+      <div class="span-5 side-note">
+        <p class="live-run" id="ops-asof" aria-live="polite">Loading the last 24 hours.</p>
+        <p class="small">Every function reports itself in log lines that CloudWatch turns into metrics <span data-info-for="emf"></span>, and X-Ray traces a sample of its calls <span data-info-for="xray"></span>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="tally-band" aria-label="The last 24 hours in four numbers">
+    <div class="wrap">
+      <ul class="tally" id="ops-tally" data-ui>
+        <li><span class="tally-n">-</span><span class="tally-l">scheduled reads in the last 24 hours</span></li>
+        <li><span class="tally-n">-</span><span class="tally-l">alarms OK</span></li>
+        <li><span class="tally-n">-</span><span class="tally-l">median API answer</span></li>
+        <li><span class="tally-n">-</span><span class="tally-l">spent on Claude in the last 24 hours</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="field-band ops-band" aria-labelledby="map-h">
+    <div class="wrap">
+      <header class="group-head"><h2 id="map-h">What called what</h2><p>The last 24 hours of X-Ray's service map, kept to this stack: each box is a part, with its calls and average time. <span data-info-for="xray"></span></p></header>
+      <div class="ops-map" id="ops-map" aria-describedby="map-note"><p class="small">Loading the service map.</p></div>
+      <p class="small" id="map-note">Lines show calls seen in traces, which X-Ray samples: the first call each second and 5% of the rest. Every health department site is one box, and so is every push service. Red is a fault: on the clock workflow, those are test clocks that the drill and scale scripts stop once their window has closed, which Step Functions reports as a fault. A window that closes on its deadline is a success. Nothing here shows what a visitor typed.</p>
+    </div>
+  </section>
+
+  <section class="stack-group" aria-labelledby="alarms-h">
+    <div class="wrap split">
+      <div class="span-4">
+        <h2 id="alarms-h" class="mini-head">Alarms</h2>
+        <p>Eight CloudWatch alarms, shown exactly as CloudWatch reports them. <span data-info-for="alarms"></span></p>
+        <p class="small">The failover drill makes the API answer 503 for a minute on purpose, so the API-errors alarm goes off during it and back to OK a few minutes later. That is the alarm working.</p>
+      </div>
+      <div class="span-8"><ul class="alarm-list ops-alarms" id="ops-alarms" aria-label="CloudWatch alarms"></ul></div>
+    </div>
+  </section>
+
+  <section class="stack-group ops-groups" aria-labelledby="day-h">
+    <div class="wrap">
+      <header class="group-head"><h2 id="day-h">The last 24 hours</h2><p>One bar per hour, newest on the right. A percentile is for the whole day, not an average of hours. <span data-info-for="p95"></span></p></header>
+      <div id="ops-groups"><p class="small">Loading.</p></div>
+    </div>
+  </section>
+
+  <section class="field-band ops-band" id="scale" aria-labelledby="scale-h">
+    <div class="wrap">
+      <header class="group-head"><h2 id="scale-h">Scale tests</h2><p>Run on this live stack with <code>scripts/scale.py</code>, with test data that never reaches the board and deletes itself. <span data-info-for="scale-test"></span></p></header>
+      <div id="ops-scale"><p class="small">Loading the last runs.</p></div>
+    </div>
+  </section>
+
+  <section class="stack-group" aria-labelledby="where-h">
+    <div class="wrap split">
+      <div class="span-4"><h2 id="where-h" class="mini-head">In the AWS account</h2></div>
+      <div class="span-8 stack-rows" role="list">
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">Dashboard</h3>
+          <p class="stack-what">One CloudWatch dashboard, <code>seventytwo-ops</code>, with the same numbers as this page and the matcher's own log as a table.</p>
+          <p class="stack-how">Defined in <code>template.yaml</code>, so every copy of the stack gets its own.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">Saved log queries</h3>
+          <p class="stack-what">Five Logs Insights queries: the work per new window, Claude spend and latency by hour, every error and warning, what push services answered, and how late each clock window closed.</p>
+          <p class="stack-how">Each function logs to its own group, kept 14 days.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">Traces</h3>
+          <p class="stack-what">X-Ray traces function runs (the first each second and 5% of the rest), with a part for each DynamoDB, S3 and SSM call, each page fetched, each Claude call and each push.</p>
+          <p class="stack-how">Searchable by source, state, window and attempt, which are recorded as annotations.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>

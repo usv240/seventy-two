@@ -1,0 +1,53 @@
+<!-- page {"title": "The Lab: read any measles or hepatitis A notice | Seventy-Two", "description": "Paste any measles exposure notice or a link to one, and watch Seventy-Two read it: every place and time, the exact words it came from, and how much of each window was left when it was published.", "nav": "lab", "scripts": ["/assets/lab.js"]} -->
+<main id="main">
+  <section class="app-top">
+    <div class="wrap split">
+      <div class="span-7">
+        <h1 class="page-title">The Lab</h1>
+        <p class="lead">Paste any measles exposure notice, or a link to one, and watch it being read. Or switch to hepatitis A: the same stack reads it with a different rule file.</p>
+      </div>
+      <div class="span-5 side-note">
+        <p>The same reader as the live board: Claude reads, then code checks every window against the notice's own words. <span data-info-for="reader"></span></p>
+        <p class="small">What you paste is never shown to anyone else and deletes itself within a day.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="app-body">
+    <div class="wrap split">
+      <form class="span-7" id="lab-form" novalidate>
+        <fieldset class="disease-switch">
+          <legend>Disease <span data-info-for="two-diseases"></span></legend>
+          <label><input type="radio" name="disease" value="measles" checked> Measles</label>
+          <label><input type="radio" name="disease" value="hepatitis_a"> Hepatitis A</label>
+        </fieldset>
+        <div class="field">
+          <label for="lab-url">A link to a notice</label>
+          <input type="url" id="lab-url" placeholder="https://www.example-county.gov/news/measles-exposure">
+        </div>
+        <div class="field">
+          <label for="lab-text">Or paste the notice text</label>
+          <textarea id="lab-text" placeholder="Paste a health department press release, a news story quoting one, or a list of exposure locations."></textarea>
+        </div>
+        <div class="actions">
+          <button class="btn" type="submit" id="lab-btn">Read it</button>
+          <button class="link-btn" type="button" id="lab-sample">Use a real notice from Wisconsin</button>
+        </div>
+        <p class="error" id="lab-error" role="alert" hidden></p>
+      </form>
+      <aside class="span-5 lab-steps" aria-live="polite">
+        <h2 class="mini-h">What happens</h2>
+        <ol class="progress" id="progress">
+          <li data-step="fetch">Open the page, or take your text</li>
+          <li data-step="read">Claude reads it and lists every place and time, each with a quote</li>
+          <li data-step="check">Code checks each quote against the notice, and each date, time and timezone</li>
+          <li data-step="rules">Code applies the CDC's 72-hour, 6-day and 21-day rules</li>
+        </ol>
+      </aside>
+    </div>
+  </section>
+
+  <section class="results" id="lab-results" aria-live="polite" hidden>
+    <div class="wrap" id="lab-out"></div>
+  </section>
+</main>

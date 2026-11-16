@@ -1,0 +1,430 @@
+{
+ "note": "Ground truth is what each notice itself says, copied by hand. Every window in every positive notice is labelled, with its place, date, start and end time. 'held_out' notices come from departments Seventy-Two does not read, were labelled before they were ever run, and were run once with the code frozen (Nov 15). 'added_after_checks' notices were added after the checks were written but are not clean: see results.md. Pages marked 'hard' contain things that look like exposures and are not, or unusual spans.",
+ "positives": [
+  {
+   "url": "https://www.phila.gov/2026-09-19-health-department-warns-of-possible-measles-exposure-at-philadelphia-international-airport/",
+   "issuer": "Philadelphia Department of Public Health",
+   "windows": 1,
+   "expect": [
+    {
+     "place": "Philadelphia International Airport",
+     "date_label": "Sep 13",
+     "start": "7:25 PM",
+     "end": "12:05 AM"
+    }
+   ]
+  },
+  {
+   "url": "https://www.phila.gov/2026-07-11-health-department-warns-of-possible-measles-exposure-at-the-philadelphia-international-airport-4/",
+   "issuer": "Philadelphia Department of Public Health",
+   "windows": 1,
+   "expect": [
+    {
+     "place": "Philadelphia International Airport",
+     "date_label": "Jul 4",
+     "start": "7:30 AM",
+     "end": "11:15 AM"
+    }
+   ]
+  },
+  {
+   "url": "https://www.phila.gov/2026-02-15-health-department-warns-of-possible-measles-exposure-at-the-philadelphia-international-airport-3/",
+   "issuer": "Philadelphia Department of Public Health",
+   "windows": 1,
+   "expect": [
+    {
+     "place": "Philadelphia International Airport",
+     "date_label": "Feb 12",
+     "start": "1:35 PM",
+     "end": "4:30 PM"
+    }
+   ]
+  },
+  {
+   "url": "https://www.phila.gov/2026-01-12-health-department-warns-of-possible-measles-exposures-at-the-philadelphia-international-airport-and-william-h-gray-iii-30th-street-station/",
+   "issuer": "Philadelphia Department of Public Health",
+   "windows": 3,
+   "expect": [
+    {
+     "place": "Airport",
+     "date_label": "Jan 7",
+     "start": "7:50 PM",
+     "end": "11:00 PM"
+    },
+    {
+     "place": "30th Street Station",
+     "date_label": "Jan 7",
+     "start": "8:15 PM",
+     "end": "11:25 PM"
+    },
+    {
+     "place": "175",
+     "date_label": "Jan 7",
+     "start": "9:23 PM",
+     "end": "11:30 PM"
+    }
+   ]
+  },
+  {
+   "url": "https://www.dhs.wisconsin.gov/news/releases/110626.htm",
+   "issuer": "Wisconsin Department of Health Services",
+   "windows": 1,
+   "expect": [
+    {
+     "place": "Marshfield",
+     "date_label": "Nov 5",
+     "start": "1:30 PM",
+     "end": "3:30 PM"
+    }
+   ]
+  },
+  {
+   "url": "https://www.polkcountyiowa.gov/health-department/news-and-press-releases/measles-case-confirmed-in-polk-county-nov-11-2026/",
+   "issuer": "Polk County Health Department",
+   "windows": 7,
+   "expect": [
+    {
+     "place": "Walmart",
+     "date_label": "Nov 5",
+     "start": "5:00 PM",
+     "end": "8:00 PM"
+    },
+    {
+     "place": "Hy-Vee",
+     "date_label": "Nov 6",
+     "start": "12:00 PM",
+     "end": "3:00 PM"
+    },
+    {
+     "place": "Urgent Care",
+     "date_label": "Nov 8",
+     "start": "10:10 AM",
+     "end": "1:15 PM"
+    },
+    {
+     "place": "waiting room",
+     "date_label": "Nov 8",
+     "start": "11:25 AM",
+     "end": "1:35 PM"
+    },
+    {
+     "place": "Blank Children",
+     "date_label": "Nov 8",
+     "start": "11:30 AM",
+     "end": "5:20 PM"
+    },
+    {
+     "place": "Hallway",
+     "date_label": "Nov 8",
+     "start": "3:15 PM",
+     "end": "5:25 PM"
+    },
+    {
+     "place": "4th Floor",
+     "date_label": "Nov 8",
+     "start": "3:20 PM",
+     "end": "10:45 PM"
+    }
+   ]
+  },
+  {
+   "url": "https://www.sandiegocounty.gov/content/sdc/hhsa/programs/phs/community_epidemiology/dc/Measles/Measles2026.html",
+   "issuer": "San Diego County HHSA",
+   "windows": 3,
+   "expect": [
+    {
+     "place": "Sharp Memorial",
+     "date_label": "Mar 11",
+     "start": "11:22 AM",
+     "end": "4:35 PM"
+    },
+    {
+     "place": "Marriott",
+     "date_label": "May 17",
+     "start": "9:00 AM",
+     "end": "3:45 PM"
+    },
+    {
+     "place": "Baskin",
+     "date_label": "May 20",
+     "start": "5:00 PM",
+     "end": "7:30 PM"
+    }
+   ]
+  },
+  {
+   "url": "https://chautauquacountyny.gov/public-health/news/chautauqua-county-health-department-alerts-community-potential-measles-exposures",
+   "issuer": "Chautauqua County Health Department",
+   "windows": 2,
+   "hard": "also lists 8 vaccine clinics with places, dates and times, which are not exposures",
+   "expect": [
+    {
+     "place": "Chautauqua",
+     "date_label": "Sep 26",
+     "start": "9:00 PM",
+     "end": "1:00 AM"
+    },
+    {
+     "place": "Chautauqua",
+     "date_label": "Sep 29",
+     "start": "9:00 AM",
+     "end": "4:00 PM"
+    }
+   ]
+  },
+  {
+   "url": "https://wausaupilotandreview.com/2026/11/06/measles-exposure-reported-at-weston-emergency-department-free-vaccine-clinic-set-for-sunday/",
+   "issuer": "Wausau Pilot & Review, reporting Marathon County Health Department",
+   "windows": 1,
+   "hard": "a news article that also announces a vaccine clinic with a place, date and time, which is not an exposure",
+   "expect": [
+    {
+     "place": "Weston",
+     "date_label": "Nov 5",
+     "start": "1:30 PM",
+     "end": "3:30 PM"
+    }
+   ]
+  },
+  {
+   "url": "https://www.nj.gov/health/news/2026/approved/20261113a.shtml",
+   "issuer": "New Jersey Department of Health",
+   "windows": 6,
+   "hard": "stays that run past midnight and over four days; a printed 'symptoms as late as' date",
+   "expect": [
+    {
+     "place": "Marriott",
+     "date_label": "Nov 6",
+     "start": "8:50 AM",
+     "end": "11:00 AM"
+    },
+    {
+     "place": "Marriott",
+     "date_label": "Nov 7",
+     "start": "10:00 AM",
+     "end": "6:30 PM"
+    },
+    {
+     "place": "Sonesta",
+     "date_label": "Nov 6",
+     "start": "9:00 PM",
+     "end": "12:00 PM"
+    },
+    {
+     "place": "Sonesta",
+     "date_label": "Nov 7",
+     "start": "5:45 PM",
+     "end": "12:45 AM"
+    },
+    {
+     "place": "Walgreens",
+     "date_label": "Nov 7",
+     "start": "4:40 PM",
+     "end": "7:40 PM"
+    },
+    {
+     "place": "Morristown",
+     "date_label": "Nov 10",
+     "start": "10:50 PM",
+     "end": "1:30 AM"
+    }
+   ],
+   "added_after_checks": true
+  },
+  {
+   "url": "https://www.wsmv.com/2026/11/05/health-department-warns-potential-measles-exposure-several-middle-tennessee-locations-heres-what-know/",
+   "issuer": "WSMV, reporting Metro Public Health Department, Nashville",
+   "windows": 8,
+   "hard": "a news story; one line names two days ('Oct. 30 & Nov. 2') with no times; a party that runs past midnight",
+   "expect": [
+    {
+     "place": "Jewelry",
+     "date_label": "Oct 30",
+     "start": null,
+     "end": null
+    },
+    {
+     "place": "Jewelry",
+     "date_label": "Nov 2",
+     "start": null,
+     "end": null
+    },
+    {
+     "place": "Westin",
+     "date_label": "Oct 31",
+     "start": "11:00 PM",
+     "end": "2:30 AM"
+    },
+    {
+     "place": "Sprouts",
+     "date_label": "Nov 1",
+     "start": "1:00 PM",
+     "end": "5:00 PM"
+    },
+    {
+     "place": "Subway",
+     "date_label": "Nov 1",
+     "start": "2:00 PM",
+     "end": "5:00 PM"
+    },
+    {
+     "place": "Remedy",
+     "date_label": "Nov 1",
+     "start": "4:00 PM",
+     "end": "7:00 PM"
+    },
+    {
+     "place": "Joint",
+     "date_label": "Nov 2",
+     "start": "3:00 PM",
+     "end": "6:00 PM"
+    },
+    {
+     "place": "CareNow",
+     "date_label": "Nov 3",
+     "start": "11:00 AM",
+     "end": "4:00 PM"
+    }
+   ],
+   "added_after_checks": true
+  },
+  {
+   "url": "https://dph.sc.gov/news/friday-measles-update-dph-reports-6-new-measles-cases-upstate-bringing-outbreak-total-985",
+   "issuer": "South Carolina Department of Public Health",
+   "held_out": true,
+   "windows": 1,
+   "hard": "also names schools with people in quarantine (no dates or times) and a free vaccine clinic with a place, date and time",
+   "expect": [
+    {
+     "place": "Costco",
+     "date_label": "Feb 22",
+     "start": "2:00 PM",
+     "end": "6:00 PM"
+    }
+   ]
+  },
+  {
+   "url": "https://dph.sc.gov/news/tuesday-measles-update-dph-reports-5-new-measles-cases-bringing-outbreak-total-990-additional",
+   "issuer": "South Carolina Department of Public Health",
+   "held_out": true,
+   "windows": 1,
+   "expect": [
+    {
+     "place": "Westgate",
+     "date_label": "Feb 22",
+     "start": "10:45 AM",
+     "end": "4:00 PM"
+    }
+   ]
+  },
+  {
+   "url": "https://kutv.com/news/local/health-officials-flag-two-salt-lake-county-locations-for-measles-exposure-as-cases-rise",
+   "issuer": "KUTV, reporting Salt Lake County Health Department",
+   "held_out": true,
+   "windows": 3,
+   "hard": "a news story with dates but no times: the whole day must count",
+   "expect": [
+    {
+     "place": "Aquarium",
+     "date_label": "Mar 10",
+     "start": null,
+     "end": null
+    },
+    {
+     "place": "Aquarium",
+     "date_label": "Mar 11",
+     "start": null,
+     "end": null
+    },
+    {
+     "place": "Clinic",
+     "date_label": "Mar 12",
+     "start": null,
+     "end": null
+    }
+   ]
+  }
+ ],
+ "negatives": [
+  {
+   "url": "https://www.cdc.gov/measles/about/index.html",
+   "issuer": "CDC"
+  },
+  {
+   "url": "https://www.cdc.gov/measles/vaccines/index.html",
+   "issuer": "CDC"
+  },
+  {
+   "url": "https://www.cdc.gov/measles/signs-symptoms/index.html",
+   "issuer": "CDC"
+  },
+  {
+   "url": "https://www.cdc.gov/measles/hcp/vaccine-considerations/index.html",
+   "issuer": "CDC"
+  },
+  {
+   "url": "https://www.usnews.com/news/us/articles/2026-11-13/us-measles-cases-rise-to-5-412-cdc-says",
+   "issuer": "US News"
+  },
+  {
+   "url": "https://www.aljazeera.com/news/2026/11/7/cdc-reports-more-than-5000-measles-cases-highest-number-in-35-years",
+   "issuer": "Al Jazeera"
+  },
+  {
+   "url": "https://www.cnbc.com/2026/11/11/measles-outbreak-us-economic-cost.html",
+   "issuer": "CNBC"
+  },
+  {
+   "url": "https://stateline.org/2026/11/13/us-poised-to-lose-its-measles-elimination-status-after-more-than-25-years/",
+   "issuer": "Stateline"
+  },
+  {
+   "url": "https://www.cidrap.umn.edu/measles/south-carolina-s-measles-outbreak-hits-700-cases-cdc-confirms-416-so-far-2026",
+   "issuer": "CIDRAP"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Measles",
+   "issuer": "Wikipedia"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Measles_resurgence_in_the_United_States",
+   "issuer": "Wikipedia"
+  },
+  {
+   "url": "https://www.who.int/news-room/fact-sheets/detail/measles",
+   "issuer": "WHO"
+  },
+  {
+   "url": "https://www.mayoclinic.org/diseases-conditions/measles/symptoms-causes/syc-20374857",
+   "issuer": "Mayo Clinic"
+  },
+  {
+   "url": "https://www.nfid.org/infectious-disease/measles/",
+   "issuer": "NFID"
+  },
+  {
+   "url": "https://www.chop.edu/vaccine-education-center/vaccine-details/measles-mumps-and-rubella-vaccines",
+   "issuer": "CHOP Vaccine Education Center"
+  },
+  {
+   "url": "https://health.utahcounty.gov/2026/04/14/drive-up-immunization-clinic-for-mmr/",
+   "issuer": "Utah County Health Department",
+   "hard": "vaccine clinic: place, date and time"
+  },
+  {
+   "url": "https://www.kttc.com/2026/09/20/fillmore-county-offers-measles-vaccinations-after-confirmed-case/",
+   "issuer": "KTTC",
+   "hard": "vaccine clinic after a confirmed case: place, date and time"
+  },
+  {
+   "url": "https://kanecountyconnects.com/article/KaneCountyHealthDept-Measles-Vaccination",
+   "issuer": "Kane County Health Department",
+   "hard": "free vaccine offer after a case: office address, dates, hours"
+  },
+  {
+   "url": "https://news.mecknc.gov/public-health-offering-same-day-vaccines-after-measles-detected-mecklenburg-county-wastewater",
+   "issuer": "Mecklenburg County Public Health",
+   "hard": "measles found in wastewater at a named plant, with dates"
+  }
+ ]
+}

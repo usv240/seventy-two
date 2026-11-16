@@ -1,0 +1,655 @@
+[
+ {
+  "test": "matcher",
+  "at": "2026-11-15T04:47:43Z",
+  "saved_trips": 10000,
+  "saved_stops": 18377,
+  "states": 52,
+  "windows": [
+   {
+    "state": "PA",
+    "day": "2026-11-10",
+    "stops_read": 391,
+    "trips_read": 300,
+    "matches": 300,
+    "ms": 6729.5,
+    "stored_to_matched_ms": 12121
+   },
+   {
+    "state": "FL",
+    "day": "2026-11-08",
+    "stops_read": 63,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 52.3,
+    "stored_to_matched_ms": 544
+   },
+   {
+    "state": "KY",
+    "day": "2026-11-07",
+    "stops_read": 91,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 63.4,
+    "stored_to_matched_ms": 816
+   },
+   {
+    "state": "NJ",
+    "day": "2026-11-05",
+    "stops_read": 74,
+    "trips_read": 2,
+    "matches": 2,
+    "ms": 85.0,
+    "stored_to_matched_ms": 1096
+   },
+   {
+    "state": "NE",
+    "day": "2026-11-08",
+    "stops_read": 53,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 60.8,
+    "stored_to_matched_ms": 2336
+   },
+   {
+    "state": "SC",
+    "day": "2026-11-01",
+    "stops_read": 57,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 61.2,
+    "stored_to_matched_ms": 823
+   },
+   {
+    "state": "CA",
+    "day": "2026-11-08",
+    "stops_read": 71,
+    "trips_read": 0,
+    "matches": 0,
+    "ms": 31.6,
+    "stored_to_matched_ms": 2235
+   },
+   {
+    "state": "TX",
+    "day": "2026-11-10",
+    "stops_read": 75,
+    "trips_read": 0,
+    "matches": 0,
+    "ms": 41.3,
+    "stored_to_matched_ms": 1318
+   }
+  ],
+  "how": "each window stored by this script, carried by DynamoDB Streams to the matcher; numbers from the matcher's own log line",
+  "note": "first run, before matches were written in parallel: the airport window took 6.7 s, which led to the change"
+ },
+ {
+  "test": "matcher",
+  "at": "2026-11-15T05:02:22Z",
+  "saved_trips": 10000,
+  "saved_stops": 18377,
+  "states": 52,
+  "windows": [
+   {
+    "state": "PA",
+    "day": "2026-11-10",
+    "stops_read": 391,
+    "trips_read": 300,
+    "matches": 300,
+    "ms": 5059.9,
+    "stored_to_matched_ms": 6850
+   },
+   {
+    "state": "FL",
+    "day": "2026-11-08",
+    "stops_read": 63,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 55.7,
+    "stored_to_matched_ms": 2098
+   },
+   {
+    "state": "KY",
+    "day": "2026-11-07",
+    "stops_read": 91,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 80.9,
+    "stored_to_matched_ms": 529
+   },
+   {
+    "state": "NJ",
+    "day": "2026-11-05",
+    "stops_read": 74,
+    "trips_read": 2,
+    "matches": 2,
+    "ms": 71.8,
+    "stored_to_matched_ms": 1536
+   },
+   {
+    "state": "NE",
+    "day": "2026-11-08",
+    "stops_read": 53,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 66.5,
+    "stored_to_matched_ms": 1889
+   },
+   {
+    "state": "SC",
+    "day": "2026-11-01",
+    "stops_read": 57,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 58.7,
+    "stored_to_matched_ms": 296
+   },
+   {
+    "state": "CA",
+    "day": "2026-11-08",
+    "stops_read": 71,
+    "trips_read": 0,
+    "matches": 0,
+    "ms": 41.7,
+    "stored_to_matched_ms": 272
+   },
+   {
+    "state": "TX",
+    "day": "2026-11-10",
+    "stops_read": 75,
+    "trips_read": 0,
+    "matches": 0,
+    "ms": 32.4,
+    "stored_to_matched_ms": 773
+   }
+  ],
+  "how": "each window stored by this script, carried by DynamoDB Streams to the matcher; numbers from the matcher's own log line",
+  "note": "second run, matches written 16 at a time on 512 MB: the airport window took 5.1 s; X-Ray showed each write waiting on a third of a CPU and 10 connections"
+ },
+ {
+  "test": "matcher",
+  "at": "2026-11-15T05:09:13Z",
+  "saved_trips": 10000,
+  "saved_stops": 18377,
+  "states": 52,
+  "windows": [
+   {
+    "state": "PA",
+    "day": "2026-11-10",
+    "stops_read": 391,
+    "trips_read": 300,
+    "matches": 300,
+    "ms": 1514.1,
+    "stored_to_matched_ms": 7885
+   },
+   {
+    "state": "FL",
+    "day": "2026-11-08",
+    "stops_read": 63,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 41.3,
+    "stored_to_matched_ms": 198
+   },
+   {
+    "state": "KY",
+    "day": "2026-11-07",
+    "stops_read": 91,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 39.5,
+    "stored_to_matched_ms": 1210
+   },
+   {
+    "state": "NJ",
+    "day": "2026-11-05",
+    "stops_read": 74,
+    "trips_read": 2,
+    "matches": 2,
+    "ms": 40.7,
+    "stored_to_matched_ms": 2537
+   },
+   {
+    "state": "NE",
+    "day": "2026-11-08",
+    "stops_read": 53,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 33.4,
+    "stored_to_matched_ms": 705
+   },
+   {
+    "state": "SC",
+    "day": "2026-11-01",
+    "stops_read": 57,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 34.8,
+    "stored_to_matched_ms": 1486
+   },
+   {
+    "state": "CA",
+    "day": "2026-11-08",
+    "stops_read": 71,
+    "trips_read": 0,
+    "matches": 0,
+    "ms": 22.5,
+    "stored_to_matched_ms": 731
+   },
+   {
+    "state": "TX",
+    "day": "2026-11-10",
+    "stops_read": 75,
+    "trips_read": 0,
+    "matches": 0,
+    "ms": 21.9,
+    "stored_to_matched_ms": 738
+   }
+  ],
+  "how": "each window stored by this script, carried by DynamoDB Streams to the matcher; numbers from the matcher's own log line"
+ },
+ {
+  "test": "burst",
+  "at": "2026-11-15T05:10:35Z",
+  "windows": 200,
+  "matched": 200,
+  "saved_trips": 10000,
+  "write_ms": 6254,
+  "drained_ms": 5584,
+  "matcher_runs": 16,
+  "slowest_stored_to_matched_ms": 5364,
+  "median_stored_to_matched_ms": 4684,
+  "matches": 242,
+  "how": "times from this laptop's clock (when each batch write returned) to CloudWatch's stamp on the matcher's log line"
+ },
+ {
+  "test": "edge",
+  "at": "2026-11-15T05:20:48Z",
+  "requests": 2000,
+  "concurrency": 40,
+  "seconds": 5.9,
+  "per_second": 339,
+  "p50_ms": 32,
+  "p95_ms": 176,
+  "p99_ms": 331,
+  "errors": 0,
+  "cache_hits": 1985,
+  "api_requests": 800,
+  "api_cache_hits": 798,
+  "paths": {
+   "/": {
+    "requests": 400,
+    "p50_ms": 33,
+    "hits": 393
+   },
+   "/api/exposures": {
+    "requests": 400,
+    "p50_ms": 33,
+    "hits": 399
+   },
+   "/api/status": {
+    "requests": 400,
+    "p50_ms": 35,
+    "hits": 399
+   },
+   "/board/": {
+    "requests": 400,
+    "p50_ms": 30,
+    "hits": 394
+   },
+   "/assets/site.css": {
+    "requests": 400,
+    "p50_ms": 30,
+    "hits": 400
+   }
+  },
+  "from": "one laptop in the US, through CloudFront, one kept-alive connection per worker"
+ },
+ {
+  "test": "clocks",
+  "at": "2026-11-15T05:26:19Z",
+  "clocks": 50,
+  "minutes": 4,
+  "started_in_s": 4.2,
+  "closed": 50,
+  "early": 0,
+  "slip_ms": {
+   "min": 533,
+   "p50": 996,
+   "max": 1542
+  },
+  "how": "each clock's own log line: wall-clock time when its window closed, minus its deadline, in milliseconds"
+ },
+ {
+  "test": "baseline",
+  "at": "2026-11-15T06:56:36Z",
+  "saved_trips": 10000,
+  "windows": [
+   {
+    "state": "PA",
+    "day": "2026-11-10",
+    "index": {
+     "ms": 966,
+     "items_read": 691,
+     "read_units": 165.5,
+     "matches": 300
+    },
+    "every_trip": {
+     "ms": 3911,
+     "items_read": 10000,
+     "read_units": 675.0,
+     "matches": 300
+    },
+    "same_matches": true
+   },
+   {
+    "state": "FL",
+    "day": "2026-11-08",
+    "index": {
+     "ms": 84,
+     "items_read": 64,
+     "read_units": 3.5,
+     "matches": 1
+    },
+    "every_trip": {
+     "ms": 3830,
+     "items_read": 10000,
+     "read_units": 675.0,
+     "matches": 1
+    },
+    "same_matches": true
+   },
+   {
+    "state": "KY",
+    "day": "2026-11-07",
+    "index": {
+     "ms": 93,
+     "items_read": 92,
+     "read_units": 4.5,
+     "matches": 1
+    },
+    "every_trip": {
+     "ms": 4207,
+     "items_read": 10000,
+     "read_units": 675.0,
+     "matches": 1
+    },
+    "same_matches": true
+   },
+   {
+    "state": "NJ",
+    "day": "2026-11-05",
+    "index": {
+     "ms": 107,
+     "items_read": 76,
+     "read_units": 4.5,
+     "matches": 2
+    },
+    "every_trip": {
+     "ms": 4384,
+     "items_read": 10000,
+     "read_units": 675.0,
+     "matches": 2
+    },
+    "same_matches": true
+   },
+   {
+    "state": "NE",
+    "day": "2026-11-08",
+    "index": {
+     "ms": 86,
+     "items_read": 54,
+     "read_units": 3.5,
+     "matches": 1
+    },
+    "every_trip": {
+     "ms": 4122,
+     "items_read": 10000,
+     "read_units": 675.0,
+     "matches": 1
+    },
+    "same_matches": true
+   },
+   {
+    "state": "SC",
+    "day": "2026-11-01",
+    "index": {
+     "ms": 90,
+     "items_read": 58,
+     "read_units": 3.5,
+     "matches": 1
+    },
+    "every_trip": {
+     "ms": 4576,
+     "items_read": 10000,
+     "read_units": 675.0,
+     "matches": 1
+    },
+    "same_matches": true
+   },
+   {
+    "state": "CA",
+    "day": "2026-11-08",
+    "index": {
+     "ms": 68,
+     "items_read": 71,
+     "read_units": 3.5,
+     "matches": 0
+    },
+    "every_trip": {
+     "ms": 4480,
+     "items_read": 10000,
+     "read_units": 675.0,
+     "matches": 0
+    },
+    "same_matches": true
+   },
+   {
+    "state": "TX",
+    "day": "2026-11-10",
+    "index": {
+     "ms": 67,
+     "items_read": 75,
+     "read_units": 3.5,
+     "matches": 0
+    },
+    "every_trip": {
+     "ms": 5658,
+     "items_read": 10000,
+     "read_units": 675.0,
+     "matches": 0
+    },
+    "same_matches": true
+   }
+  ],
+  "usd_per_million_windows": {
+   "index": 3.0,
+   "every_trip": 84.37
+  },
+  "how": "both designs run from this laptop against the live table, one after the other, for each window"
+ },
+ {
+  "test": "matcher",
+  "at": "2026-11-15T07:39:45Z",
+  "saved_trips": 10000,
+  "saved_stops": 18377,
+  "states": 52,
+  "windows": [
+   {
+    "state": "PA",
+    "day": "2026-11-10",
+    "stops_read": 391,
+    "trips_read": 300,
+    "matches": 300,
+    "ms": 2282.5,
+    "stored_to_matched_ms": 6736
+   },
+   {
+    "state": "FL",
+    "day": "2026-11-08",
+    "stops_read": 63,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 56.2,
+    "stored_to_matched_ms": 724
+   },
+   {
+    "state": "KY",
+    "day": "2026-11-07",
+    "stops_read": 91,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 44.7,
+    "stored_to_matched_ms": 1806
+   },
+   {
+    "state": "NJ",
+    "day": "2026-11-05",
+    "stops_read": 74,
+    "trips_read": 2,
+    "matches": 2,
+    "ms": 47.0,
+    "stored_to_matched_ms": 990
+   },
+   {
+    "state": "NE",
+    "day": "2026-11-08",
+    "stops_read": 53,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 37.1,
+    "stored_to_matched_ms": 1479
+   },
+   {
+    "state": "SC",
+    "day": "2026-11-01",
+    "stops_read": 57,
+    "trips_read": 1,
+    "matches": 1,
+    "ms": 41.8,
+    "stored_to_matched_ms": 1936
+   },
+   {
+    "state": "CA",
+    "day": "2026-11-08",
+    "stops_read": 71,
+    "trips_read": 0,
+    "matches": 0,
+    "ms": 22.0,
+    "stored_to_matched_ms": 981
+   },
+   {
+    "state": "TX",
+    "day": "2026-11-10",
+    "stops_read": 75,
+    "trips_read": 0,
+    "matches": 0,
+    "ms": 23.9,
+    "stored_to_matched_ms": 737
+   }
+  ],
+  "how": "each window stored by this script, carried by DynamoDB Streams to the matcher; numbers from the matcher's own log line"
+ },
+ {
+  "test": "burst",
+  "at": "2026-11-15T07:40:17Z",
+  "windows": 200,
+  "matched": 200,
+  "saved_trips": 10000,
+  "write_ms": 3365,
+  "drained_ms": 6690,
+  "matcher_runs": 52,
+  "slowest_stored_to_matched_ms": 6215,
+  "median_stored_to_matched_ms": 4430,
+  "matches": 242,
+  "how": "times from this laptop's clock (when each batch write returned) to CloudWatch's stamp on the matcher's log line"
+ },
+ {
+  "test": "scheduler",
+  "at": "2026-11-15T21:38:28+00:00",
+  "what": "one-time EventBridge Scheduler schedules, at(...) with the flexible window off, each sending to SQS; lateness is SQS's SentTimestamp minus the due time",
+  "schedules": 50,
+  "delivered": 50,
+  "late_s": {
+   "min": 0.09,
+   "median": 24.03,
+   "p95": 46.02,
+   "max": 50.02
+  },
+  "early": 0,
+  "cancelled": 10,
+  "cancelled_that_still_fired": 0,
+  "all_late_s": [
+   0.09,
+   4.01,
+   7.02,
+   8.01,
+   10.01,
+   10.02,
+   10.07,
+   10.5,
+   11.02,
+   11.04,
+   11.05,
+   12.02,
+   12.06,
+   13.01,
+   13.12,
+   15.05,
+   16.04,
+   16.09,
+   19.02,
+   21.02,
+   22.02,
+   22.03,
+   23.02,
+   23.04,
+   23.05,
+   25.01,
+   26.04,
+   26.04,
+   26.12,
+   27.02,
+   28.06,
+   29.05,
+   32.02,
+   32.12,
+   32.14,
+   34.29,
+   36.02,
+   36.02,
+   36.04,
+   36.08,
+   37.04,
+   38.04,
+   40.06,
+   43.03,
+   45.01,
+   46.02,
+   46.02,
+   46.05,
+   47.04,
+   50.02
+  ],
+  "how": "bench/clock_vs_scheduler.py: one-time schedules due at whole seconds over two minutes, each sending its due time to SQS; lateness is SQS's SentTimestamp minus the due time"
+ },
+ {
+  "test": "race",
+  "at": "2026-11-16T00:05:34+00:00",
+  "what": "100 clocks; 'I acted' sent to each within a second either side of its deadline",
+  "clocks": 100,
+  "ended_exactly_once": 100,
+  "ended_twice_or_never": 0,
+  "acted": 32,
+  "missed": 68,
+  "answer_agrees_with_outcome": 100,
+  "exactly_one_final_message": 100,
+  "latest_press_still_in_time_s": 0.144,
+  "earliest_press_too_late_s": -0.852,
+  "press_sent_s_after_deadline": {
+   "min": -0.973,
+   "median": -0.004,
+   "max": 0.986
+  },
+  "how": "bench/clock_race.py against patterns/deadline-clock, deployed then deleted; outcomes from each execution's history, messages from a queue on the topic"
+ }
+]

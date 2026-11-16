@@ -1,0 +1,750 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Seventy-Two. Reads public health exposure notices from the health department pages in its source list, checks
+  whether you were there, watches your trip, and runs your clock. Serverless only: no servers, no pipeline.
+
+Parameters:
+  CodeBucket: {Type: String, Description: Bucket holding the code and layer zips}
+  CodeKey: {Type: String}
+  LayerKey: {Type: String}
+  ReaderModel: {Type: String, Default: us.anthropic.claude-haiku-4-5-20251001-v1:0, Description: Bedrock inference profile the reader calls (US Regions only)}
+  ReaderBaseModel: {Type: String, Default: anthropic.claude-haiku-4-5-20251001-v1:0, Description: The foundation model behind that profile (scopes the IAM policy)}
+  FromEmail: {Type: String, Default: "", Description: A verified SES sender address. Leave empty to skip email.}
+  AlertEmail: {Type: String, Default: "", Description: Optional. An address subscribed to the stack's alarms through SNS.}
+  Domain: {Type: String, Default: measles, AllowedValues: [measles, hepatitis_a], Description: Which disease this stack watches (src/domains/)}
+  OriginSecret: {Type: String, NoEcho: true, MinLength: 32, Description: "The header value CloudFront adds to API requests, made by deploy.py and kept in SSM"}
+  OriginSecretPrevious: {Type: String, NoEcho: true, Default: "", Description: "Also accepted while a new secret reaches CloudFront"}
+
+Conditions:
+  HasAlertEmail: !Not [!Equals [!Ref AlertEmail, ""]]
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Architectures: [arm64]
+    CodeUri: {Bucket: !Ref CodeBucket, Key: !Ref CodeKey}
+    Layers: [!Ref DepsLayer]
+    MemorySize: 512
+    Timeout: 30
+    Tracing: Active
+    Environment:
+      Variables:
+        TABLE: !Ref Table
+        ARCHIVE_BUCKET: !Ref ArchiveBucket
+        SITE_BUCKET: !Ref SiteBucket
+        MODEL_READER: !Ref ReaderModel
+        BEDROCK_REGION: !Ref AWS::Region
+        FROM_EMAIL: !Ref FromEmail
+        POWERTOOLS_SERVICE_NAME: seventytwo
+        DOMAIN: !Ref Domain
+        VAPID_KEY_PARAM: !Sub "/${AWS::StackName}/vapid-private-key"   # Web Push signing key, made by deploy.py
+        PRICE_IN_PER_M: "1.10"    # US geo inference profile list price per million tokens
+        PRICE_OUT_PER_M: "5.50"
+        AWS_XRAY_CONTEXT_MISSING: IGNORE_ERROR   # tracing never fails a request (src/obs.py)
+
+Resources:
+  # ---------- data ----------
+  Table:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - {AttributeName: pk, AttributeType: S}
+        - {AttributeName: sk, AttributeType: S}
+        - {AttributeName: gsi1pk, AttributeType: S}
+        - {AttributeName: gsi1sk, AttributeType: S}
+      KeySchema:
+        - {AttributeName: pk, KeyType: HASH}
+        - {AttributeName: sk, KeyType: RANGE}
+      GlobalSecondaryIndexes:
+        - IndexName: gsi1
+          KeySchema:
+            - {AttributeName: gsi1pk, KeyType: HASH}
+            - {AttributeName: gsi1sk, KeyType: RANGE}
+          Projection: {ProjectionType: ALL}
+      TimeToLiveSpecification: {AttributeName: ttl, Enabled: true}   # visitor data deletes itself
+      SSESpecification: {SSEEnabled: true}
+      StreamSpecification: {StreamViewType: NEW_IMAGE}               # new exposure windows reach saved trips
+
+  ArchiveBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration: {BlockPublicAcls: true, BlockPublicPolicy: true, IgnorePublicAcls: true, RestrictPublicBuckets: true}
+      BucketEncryption: {ServerSideEncryptionConfiguration: [{ServerSideEncryptionByDefault: {SSEAlgorithm: AES256}}]}
+
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration: {BlockPublicAcls: true, BlockPublicPolicy: true, IgnorePublicAcls: true, RestrictPublicBuckets: true}
+
+  DepsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      Description: anthropic SDK 1.x (pinned below 2.0 for Bedrock models before Claude 4.7) and tzdata
+      ContentUri: {Bucket: !Ref CodeBucket, Key: !Ref LayerKey}
+      CompatibleRuntimes: [python3.12]
+      CompatibleArchitectures: [arm64]
+
+  # ---------- logs: kept 14 days, then deleted (visitor data is not logged, but logs should forget too) ----------
+  IngestLogs: {Type: AWS::Logs::LogGroup, Properties: {LogGroupName: !Sub "/${AWS::StackName}/ingest", RetentionInDays: 14}}
+  SnapshotLogs: {Type: AWS::Logs::LogGroup, Properties: {LogGroupName: !Sub "/${AWS::StackName}/snapshot", RetentionInDays: 14}}
+  ClockLogs: {Type: AWS::Logs::LogGroup, Properties: {LogGroupName: !Sub "/${AWS::StackName}/clock", RetentionInDays: 14}}
+  MatcherLogs: {Type: AWS::Logs::LogGroup, Properties: {LogGroupName: !Sub "/${AWS::StackName}/matcher", RetentionInDays: 14}}
+  ApiLogs: {Type: AWS::Logs::LogGroup, Properties: {LogGroupName: !Sub "/${AWS::StackName}/api", RetentionInDays: 14}}
+
+  # ---------- functions ----------
+  IngestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: ingest.handler
+      Timeout: 180
+      MemorySize: 1024
+      LoggingConfig: {LogGroup: !Ref IngestLogs}
+      Policies:
+        - Statement:
+            - Effect: Allow   # read the source list, archive each changed page
+              Action: [s3:GetObject, s3:PutObject]
+              Resource: !Sub "${ArchiveBucket.Arn}/*"
+            - Effect: Allow   # only the table operations this function makes
+              Action: [dynamodb:GetItem, dynamodb:PutItem, dynamodb:UpdateItem, dynamodb:Query]
+              Resource: [!GetAtt Table.Arn, !Sub "${Table.Arn}/index/*"]
+            - Effect: Allow   # only the reader model, through its US inference profile
+              Action: [bedrock:InvokeModel, bedrock:InvokeModelWithResponseStream]
+              Resource:
+                - !Sub "arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${ReaderModel}"
+                - !Sub "arn:${AWS::Partition}:bedrock:us-*::foundation-model/${ReaderBaseModel}"
+
+  SnapshotFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: ingest.snapshot
+      Timeout: 60
+      LoggingConfig: {LogGroup: !Ref SnapshotLogs}
+      Policies:
+        - Statement:
+            - Effect: Allow   # read the windows for the board
+              Action: [dynamodb:Query]
+              Resource: [!GetAtt Table.Arn, !Sub "${Table.Arn}/index/*"]
+            - Effect: Allow   # only the board snapshot, never the site's pages
+              Action: [s3:PutObject]
+              Resource: [!Sub "${SiteBucket.Arn}/data/exposures.json", !Sub "${SiteBucket.Arn}/api/exposures"]
+
+  ClockFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: clock.handler
+      LoggingConfig: {LogGroup: !Ref ClockLogs}
+      Policies:
+        - Statement:
+            - Effect: Allow   # only the table operations this function makes
+              Action: [dynamodb:GetItem, dynamodb:UpdateItem]
+              Resource: [!GetAtt Table.Arn, !Sub "${Table.Arn}/index/*"]
+            - Effect: Allow   # resume a person's workflow when "I got it" arrived just before its token was saved
+              Action: [states:SendTaskSuccess]
+              Resource: !Sub "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${AWS::StackName}-clock"
+            - {Effect: Allow, Action: [ssm:GetParameter], Resource: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/vapid-private-key"}
+            - {Effect: Allow, Action: [ses:SendEmail], Resource: !Sub "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/*"}
+
+  MatcherFunction:   # DynamoDB Streams -> every saved trip, the moment a new exposure window is stored
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: watch.on_new_windows
+      Timeout: 60
+      MemorySize: 1769   # one full vCPU: an airport exposure can mean hundreds of matches written at once (scripts/scale.py)
+      LoggingConfig: {LogGroup: !Ref MatcherLogs}
+      Policies:
+        - SQSSendMessagePolicy: {QueueName: !GetAtt MatcherFailures.QueueName}
+        - Statement:
+            - Effect: Allow   # only the table operations this function makes
+              Action: [dynamodb:GetItem, dynamodb:BatchGetItem, dynamodb:PutItem, dynamodb:UpdateItem, dynamodb:Query]
+              Resource: [!GetAtt Table.Arn, !Sub "${Table.Arn}/index/*"]
+            - {Effect: Allow, Action: [ssm:GetParameter], Resource: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/vapid-private-key"}
+            - {Effect: Allow, Action: [ses:SendEmail], Resource: !Sub "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/*"}
+      Events:
+        NewWindows:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt Table.StreamArn
+            StartingPosition: LATEST
+            BatchSize: 25
+            MaximumBatchingWindowInSeconds: 2
+            ParallelizationFactor: 4   # up to 4 batches per shard at once; a window's own updates stay in order
+            MaximumRetryAttempts: 3
+            BisectBatchOnFunctionError: true
+            DestinationConfig: {OnFailure: {Type: SQS, Destination: !GetAtt MatcherFailures.Arn}}
+            FilterCriteria:   # only brand-new windows; re-reads are MODIFY events and never reach the function
+              Filters:
+                - Pattern: '{"eventName": ["INSERT"], "dynamodb": {"Keys": {"pk": {"S": [{"prefix": "WINDOW#"}]}}}}'
+
+  MatcherFailures:   # records which stream batch failed after retries (its position, not the windows); scripts/replay.py re-matches
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600
+      SqsManagedSseEnabled: true
+
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: api.handler
+      MemorySize: 1024
+      Timeout: 29
+      LoggingConfig: {LogGroup: !Ref ApiLogs}
+      Environment:
+        Variables:
+          CLOCK_STATE_MACHINE_ARN: !Ref ClockStateMachine
+          ORIGIN_SECRET: !Join [",", [!Ref OriginSecret, !Ref OriginSecretPrevious]]   # CloudFront adds it; direct calls are refused
+          ALARM_NAMES: !Sub "${AWS::StackName}-sources-failing,${AWS::StackName}-read-failed,${AWS::StackName}-reads-stopped,${AWS::StackName}-matcher-failed,${AWS::StackName}-matcher-lagging,${AWS::StackName}-clock-failed,${AWS::StackName}-api-errors,${AWS::StackName}-model-spend"
+          OPS_FUNCTIONS: !Sub '{"ingest": "${IngestFunction}", "snapshot": "${SnapshotFunction}", "matcher": "${MatcherFunction}", "clock": "${ClockFunction}"}'
+          OPS_INGEST_SM: !Ref IngestStateMachine
+          OPS_QUEUE: !GetAtt MatcherFailures.QueueName
+          OPS_DISTRIBUTION_PARAM: !Sub "/${AWS::StackName}/distribution-id"
+      Policies:
+        - Statement:
+            - Effect: Allow   # a short-lived link to an archived notice's text
+              Action: [s3:GetObject]
+              Resource: !Sub "${ArchiveBucket.Arn}/*"
+            - Effect: Allow   # only the table operations this function makes
+              Action: [dynamodb:GetItem, dynamodb:PutItem, dynamodb:UpdateItem, dynamodb:DeleteItem, dynamodb:Query, dynamodb:BatchWriteItem]
+              Resource: [!GetAtt Table.Arn, !Sub "${Table.Arn}/index/*"]
+            - {Effect: Allow, Action: [ssm:GetParameter], Resource: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/vapid-private-key"}
+            - Effect: Allow
+              Action: [bedrock:InvokeModel, bedrock:InvokeModelWithResponseStream]
+              Resource:
+                - !Sub "arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${ReaderModel}"
+                - !Sub "arn:${AWS::Partition}:bedrock:us-*::foundation-model/${ReaderBaseModel}"
+            - {Effect: Allow, Action: [states:StartExecution], Resource: !Ref ClockStateMachine}
+            - Effect: Allow
+              Action: [states:DescribeExecution, states:GetExecutionHistory]
+              Resource: !Sub "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${AWS::StackName}-clock:*"
+            - {Effect: Allow, Action: [states:SendTaskSuccess, states:SendTaskFailure], Resource: !Ref ClockStateMachine}
+            - Effect: Allow   # the status panel shows the stack's alarms as CloudWatch reports them
+              Action: [cloudwatch:DescribeAlarms]
+              Resource: !Sub "arn:${AWS::Partition}:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${AWS::StackName}-*"
+            - Effect: Allow   # the /ops/ page: read-only metrics and the service map (neither API takes a resource)
+              Action: [cloudwatch:GetMetricData, xray:GetServiceGraph]
+              Resource: "*"
+            - {Effect: Allow, Action: [ssm:GetParameter], Resource: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/distribution-id"}
+      Events:
+        Exposures: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: GET, Path: /api/exposures}}
+        Exposure: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: GET, Path: "/api/exposures/{id}"}}
+        Check: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: POST, Path: /api/check}}
+        CreateClock: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: POST, Path: /api/clocks}}
+        GetClock: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: GET, Path: "/api/clocks/{id}"}}
+        ClockDone: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: POST, Path: "/api/clocks/{id}/done"}}
+        LabRead: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: POST, Path: /api/lab/read}}
+        Status: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: GET, Path: /api/status}}
+        Ops: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: GET, Path: /api/ops}}
+        SaveTrip: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: POST, Path: /api/watches}}
+        GetTrip: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: GET, Path: "/api/watches/{id}"}}
+        DeleteTrip: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: DELETE, Path: "/api/watches/{id}"}}
+        TripCalendar: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: GET, Path: "/api/watches/{id}/calendar"}}
+        PushKey: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: GET, Path: /api/push/key}}
+        TripAlerts: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: POST, Path: "/api/watches/{id}/push"}}
+        ClockAlerts: {Type: HttpApi, Properties: {ApiId: !Ref Api, Method: POST, Path: "/api/clocks/{id}/push"}}
+
+  Api:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      DefaultRouteSettings: {ThrottlingBurstLimit: 50, ThrottlingRateLimit: 20}
+
+  # ---------- workflows ----------
+  IngestStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: !Sub "${AWS::StackName}-ingest"
+      Type: STANDARD
+      Tracing: {Enabled: true}
+      DefinitionSubstitutions:
+        ArchiveBucket: !Ref ArchiveBucket
+        IngestFunctionArn: !GetAtt IngestFunction.Arn
+        SnapshotFunctionArn: !GetAtt SnapshotFunction.Arn
+      Definition:
+        Comment: Read every health-department source in parallel, then publish the board.
+        StartAt: ReadEverySource
+        States:
+          ReadEverySource:
+            Type: Map
+            ItemReader:
+              Resource: arn:aws:states:::s3:getObject
+              ReaderConfig: {InputType: JSON}
+              Parameters: {Bucket: "${ArchiveBucket}", Key: config/sources.json}
+            ItemProcessor:
+              ProcessorConfig: {Mode: DISTRIBUTED, ExecutionType: EXPRESS}   # each source is a short Express child: billed per run, not per step
+              StartAt: ReadOneSource
+              States:
+                ReadOneSource:
+                  Type: Task
+                  Resource: arn:aws:states:::lambda:invoke
+                  Parameters: {FunctionName: "${IngestFunctionArn}", Payload: {"source.$": "$", "attempt.$": "$$.State.RetryCount", "last_attempt": 2}}
+                  OutputPath: $.Payload
+                  Retry:
+                    - ErrorEquals: [SourceUnreachable, Lambda.ServiceException, Lambda.TooManyRequestsException, Lambda.SdkClientException]
+                      IntervalSeconds: 10
+                      MaxAttempts: 2
+                      BackoffRate: 3
+                      JitterStrategy: FULL
+                    - ErrorEquals: [States.TaskFailed]
+                      IntervalSeconds: 20
+                      MaxAttempts: 1
+                  End: true
+            MaxConcurrency: 6
+            ToleratedFailurePercentage: 50
+            ResultPath: $.sources
+            Next: PublishBoard
+          PublishBoard:
+            Type: Task
+            Resource: arn:aws:states:::lambda:invoke
+            Parameters: {FunctionName: "${SnapshotFunctionArn}", Payload: {}}
+            OutputPath: $.Payload
+            Retry: [{ErrorEquals: [States.ALL], IntervalSeconds: 5, MaxAttempts: 3, BackoffRate: 2, JitterStrategy: FULL}]
+            End: true
+      Policies:
+        - LambdaInvokePolicy: {FunctionName: !Ref IngestFunction}
+        - LambdaInvokePolicy: {FunctionName: !Ref SnapshotFunction}
+        - S3ReadPolicy: {BucketName: !Ref ArchiveBucket}
+        - Statement:
+            - Effect: Allow
+              Action: [states:StartExecution]
+              Resource: !Sub "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${AWS::StackName}-ingest"
+            - Effect: Allow
+              Action: [states:DescribeExecution, states:StopExecution]
+              Resource: !Sub "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${AWS::StackName}-ingest/*"
+            - Effect: Allow   # Express children report back to the Map synchronously
+              Action: [states:StartSyncExecution]
+              Resource: !Sub "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${AWS::StackName}-ingest"
+      Events:
+        Every30Minutes:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(30 minutes)
+            FlexibleTimeWindow: {Mode: FLEXIBLE, MaximumWindowInMinutes: 5}
+
+  ClockStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: !Sub "${AWS::StackName}-clock"
+      Type: STANDARD
+      Tracing: {Enabled: true}
+      DefinitionSubstitutions:
+        ClockFunctionArn: !GetAtt ClockFunction.Arn
+      Definition:
+        Comment: >
+          One clock per person, for any disease in src/domains/. Each deadline is one iteration of the Map: wait until a
+          day before it, remind, then wait for the person (a task token) or for the deadline (the token's timeout). Waiting costs nothing.
+        StartAt: PlanDeadlines
+        States:
+          PlanDeadlines:
+            Type: Task
+            Resource: arn:aws:states:::lambda:invoke
+            Retry: [{ErrorEquals: [Lambda.ServiceException, Lambda.AWSLambdaException, Lambda.SdkClientException, Lambda.TooManyRequestsException], IntervalSeconds: 2, MaxAttempts: 4, BackoffRate: 2, JitterStrategy: FULL}, {ErrorEquals: [States.TaskFailed], IntervalSeconds: 5, MaxAttempts: 3, BackoffRate: 2, JitterStrategy: FULL}]
+            Parameters: {FunctionName: "${ClockFunctionArn}", Payload: {step: plan, "clock_id.$": $.clock_id, "deadlines.$": $.deadlines, "as_of.$": $.as_of, "scale.$": $.scale}}
+            ResultSelector: {"plan.$": $.Payload}
+            ResultPath: $.p
+            Next: EveryDeadline
+          EveryDeadline:
+            Type: Map
+            ItemsPath: $.p.plan.items
+            ItemSelector: {"clock_id.$": $.clock_id, "d.$": $$.Map.Item.Value}
+            MaxConcurrency: 0
+            ResultPath: null
+            Next: ClockFinished
+            ItemProcessor:
+              ProcessorConfig: {Mode: INLINE}
+              StartAt: ActionOrMilestone
+              States:
+                ActionOrMilestone:
+                  Type: Choice
+                  Choices: [{Variable: $.d.type, StringEquals: milestone, Next: WaitUntilMilestone}]
+                  Default: IsWindowOpen
+                WaitUntilMilestone: {Type: Wait, TimestampPath: $.d.at, Next: Milestone}
+                Milestone:
+                  Type: Task
+                  Resource: arn:aws:states:::lambda:invoke
+                  Retry: [{ErrorEquals: [Lambda.ServiceException, Lambda.AWSLambdaException, Lambda.SdkClientException, Lambda.TooManyRequestsException], IntervalSeconds: 2, MaxAttempts: 4, BackoffRate: 2, JitterStrategy: FULL}, {ErrorEquals: [States.TaskFailed], IntervalSeconds: 5, MaxAttempts: 3, BackoffRate: 2, JitterStrategy: FULL}]
+                  Parameters: {FunctionName: "${ClockFunctionArn}", Payload: {step: notify, "kind.$": $.d.kind, "clock_id.$": $.clock_id}}
+                  ResultPath: null
+                  End: true
+                IsWindowOpen:
+                  Type: Choice
+                  Choices: [{Variable: $.d.open, BooleanEquals: true, Next: WaitUntilDayBeforeDeadline}]
+                  Default: AlreadyClosed
+                AlreadyClosed: {Type: Succeed}
+                WaitUntilDayBeforeDeadline: {Type: Wait, TimestampPath: $.d.remind_at, Next: Remind}
+                Remind:
+                  Type: Task
+                  Resource: arn:aws:states:::lambda:invoke
+                  Retry: [{ErrorEquals: [Lambda.ServiceException, Lambda.AWSLambdaException, Lambda.SdkClientException, Lambda.TooManyRequestsException], IntervalSeconds: 2, MaxAttempts: 4, BackoffRate: 2, JitterStrategy: FULL}, {ErrorEquals: [States.TaskFailed], IntervalSeconds: 5, MaxAttempts: 3, BackoffRate: 2, JitterStrategy: FULL}]
+                  Parameters: {FunctionName: "${ClockFunctionArn}", Payload: {step: notify, "kind.$": "States.Format('{}_reminder', $.d.kind)", "clock_id.$": $.clock_id, "deadline_at.$": $.d.deadline_at}}
+                  ResultSelector: {"skip.$": $.Payload.skip, "wait_s.$": $.Payload.wait_s}   # seconds left to the deadline, measured after the reminder
+                  ResultPath: $.r
+                  Next: StillNeeded
+                StillNeeded:
+                  Type: Choice
+                  Choices: [{Variable: $.r.skip, BooleanEquals: true, Next: AlreadyCovered}]
+                  Default: WaitForYou
+                AlreadyCovered: {Type: Succeed}
+                WaitForYou:
+                  Type: Task
+                  Resource: arn:aws:states:::lambda:invoke.waitForTaskToken
+                  Retry: [{ErrorEquals: [Lambda.ServiceException, Lambda.AWSLambdaException, Lambda.SdkClientException, Lambda.TooManyRequestsException], IntervalSeconds: 2, MaxAttempts: 4, BackoffRate: 2, JitterStrategy: FULL}, {ErrorEquals: [States.TaskFailed], IntervalSeconds: 5, MaxAttempts: 3, BackoffRate: 2, JitterStrategy: FULL}]
+                  Parameters: {FunctionName: "${ClockFunctionArn}", Payload: {step: wait, "kind.$": $.d.kind, "clock_id.$": $.clock_id, "token.$": $$.Task.Token}}
+                  TimeoutSecondsPath: $.r.wait_s   # the deadline itself: a slow or retried reminder cannot move it
+                  ResultPath: null
+                  Catch: [{ErrorEquals: [States.Timeout], ResultPath: null, Next: WindowClosed}]
+                  Next: YouGotIt
+                YouGotIt:
+                  Type: Task
+                  Resource: arn:aws:states:::lambda:invoke
+                  Retry: [{ErrorEquals: [Lambda.ServiceException, Lambda.AWSLambdaException, Lambda.SdkClientException, Lambda.TooManyRequestsException], IntervalSeconds: 2, MaxAttempts: 4, BackoffRate: 2, JitterStrategy: FULL}, {ErrorEquals: [States.TaskFailed], IntervalSeconds: 5, MaxAttempts: 3, BackoffRate: 2, JitterStrategy: FULL}]
+                  Parameters: {FunctionName: "${ClockFunctionArn}", Payload: {step: notify, "kind.$": "States.Format('{}_done', $.d.kind)", "clock_id.$": $.clock_id}}
+                  ResultPath: null
+                  End: true
+                WindowClosed:
+                  Type: Task
+                  Resource: arn:aws:states:::lambda:invoke
+                  Retry: [{ErrorEquals: [Lambda.ServiceException, Lambda.AWSLambdaException, Lambda.SdkClientException, Lambda.TooManyRequestsException], IntervalSeconds: 2, MaxAttempts: 4, BackoffRate: 2, JitterStrategy: FULL}, {ErrorEquals: [States.TaskFailed], IntervalSeconds: 5, MaxAttempts: 3, BackoffRate: 2, JitterStrategy: FULL}]
+                  Parameters: {FunctionName: "${ClockFunctionArn}", Payload: {step: notify, "kind.$": "States.Format('{}_closed', $.d.kind)", "clock_id.$": $.clock_id, "deadline_at.$": $.d.deadline_at}}
+                  ResultPath: null
+                  End: true
+          ClockFinished:
+            Type: Task
+            Resource: arn:aws:states:::lambda:invoke
+            Retry: [{ErrorEquals: [Lambda.ServiceException, Lambda.AWSLambdaException, Lambda.SdkClientException, Lambda.TooManyRequestsException], IntervalSeconds: 2, MaxAttempts: 4, BackoffRate: 2, JitterStrategy: FULL}, {ErrorEquals: [States.TaskFailed], IntervalSeconds: 5, MaxAttempts: 3, BackoffRate: 2, JitterStrategy: FULL}]
+            Parameters: {FunctionName: "${ClockFunctionArn}", Payload: {step: notify, kind: closed, "clock_id.$": $.clock_id}}
+            ResultPath: null
+            End: true
+      Policies:
+        - LambdaInvokePolicy: {FunctionName: !Ref ClockFunction}
+
+  # ---------- alarms (shown live on the board's status panel) ----------
+  AlarmTopic:   # alarm messages hold no visitor data; CloudWatch cannot publish to a topic under the AWS-managed SNS key
+    Type: AWS::SNS::Topic
+
+  AlarmEmail:
+    Type: AWS::SNS::Subscription
+    Condition: HasAlertEmail
+    Properties: {TopicArn: !Ref AlarmTopic, Protocol: email, Endpoint: !Ref AlertEmail}
+
+  SourcesFailingAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-sources-failing"
+      AlarmDescription: In each of three half-hour periods in a row, at least one health department page could not be read, even after retries.
+      Namespace: SeventyTwo
+      MetricName: SourceFailed
+      Statistic: Sum
+      Period: 1800
+      EvaluationPeriods: 3
+      DatapointsToAlarm: 3
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopic]
+      OKActions: [!Ref AlarmTopic]
+
+  ReadFailedAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-read-failed"
+      AlarmDescription: A scheduled read failed as a whole (more than half of the sources failed, or the board was not published).
+      Namespace: AWS/States
+      MetricName: ExecutionsFailed
+      Dimensions: [{Name: StateMachineArn, Value: !Ref IngestStateMachine}]
+      Statistic: Sum
+      Period: 3600
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopic]
+      OKActions: [!Ref AlarmTopic]
+
+  MatcherFailedAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-matcher-failed"
+      AlarmDescription: New exposure windows could not be matched against saved trips, even after retries.
+      Namespace: AWS/SQS
+      MetricName: ApproximateNumberOfMessagesVisible
+      Dimensions: [{Name: QueueName, Value: !GetAtt MatcherFailures.QueueName}]
+      Statistic: Maximum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopic]
+      OKActions: [!Ref AlarmTopic]
+
+  ReadsStoppedAlarm:   # a dead-man switch: silence counts as failure
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-reads-stopped"
+      AlarmDescription: No scheduled read has started in the last hour.
+      Namespace: AWS/States
+      MetricName: ExecutionsStarted
+      Dimensions: [{Name: StateMachineArn, Value: !Ref IngestStateMachine}]
+      Statistic: Sum
+      Period: 3600
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: LessThanThreshold
+      TreatMissingData: breaching
+      AlarmActions: [!Ref AlarmTopic]
+      OKActions: [!Ref AlarmTopic]
+
+  ApiErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-api-errors"
+      AlarmDescription: The API answered with server errors (5xx) at least 5 times in 5 minutes.
+      Namespace: AWS/ApiGateway
+      MetricName: 5xx
+      Dimensions: [{Name: ApiId, Value: !Ref Api}]
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 5
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopic]
+      OKActions: [!Ref AlarmTopic]
+
+  ClockFailedAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-clock-failed"
+      AlarmDescription: A person's clock workflow failed, even after its steps were retried.
+      Namespace: AWS/States
+      MetricName: ExecutionsFailed
+      Dimensions: [{Name: StateMachineArn, Value: !Ref ClockStateMachine}]
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopic]
+      OKActions: [!Ref AlarmTopic]
+
+  MatcherLaggingAlarm:   # the stream is falling behind: new windows wait more than a minute to be matched
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-matcher-lagging"
+      AlarmDescription: New exposure windows waited more than a minute in the stream before being matched, twice in a row.
+      Namespace: AWS/Lambda
+      MetricName: IteratorAge
+      Dimensions: [{Name: FunctionName, Value: !Ref MatcherFunction}]
+      Statistic: Maximum
+      Period: 300
+      EvaluationPeriods: 2
+      DatapointsToAlarm: 2
+      Threshold: 60000
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopic]
+      OKActions: [!Ref AlarmTopic]
+
+  ModelSpendAlarm:   # a cost guard: a normal hour spends cents
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-model-spend"
+      AlarmDescription: Claude spent more than 1 US dollar in one hour (a normal hour spends a few cents).
+      Namespace: SeventyTwo
+      MetricName: ModelCostUSD
+      Statistic: Sum
+      Period: 3600
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopic]
+      OKActions: [!Ref AlarmTopic]
+
+  # ---------- edge ----------
+  SiteOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "${AWS::StackName}-site"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  IndexRewrite:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: !Sub "${AWS::StackName}-index"
+      AutoPublish: true
+      FunctionConfig: {Comment: "folder URLs to index.html", Runtime: cloudfront-js-2.0}
+      FunctionCode: |
+        function handler(event) {
+          var r = event.request;
+          if (r.uri.endsWith('/')) { r.uri += 'index.html'; }
+          else if (!r.uri.split('/').pop().includes('.')) { r.uri += '/index.html'; }
+          return r;
+        }
+
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: Seventy-Two
+        HttpVersion: http2and3
+        DefaultRootObject: index.html
+        PriceClass: PriceClass_100
+        Origins:
+          - Id: site
+            DomainName: !GetAtt SiteBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt SiteOAC.Id
+            S3OriginConfig: {OriginAccessIdentity: ""}
+          - Id: api
+            DomainName: !Sub "${Api}.execute-api.${AWS::Region}.amazonaws.com"
+            CustomOriginConfig: {OriginProtocolPolicy: https-only, OriginSSLProtocols: [TLSv1.2]}
+            OriginCustomHeaders: [{HeaderName: x-origin-verify, HeaderValue: !Ref OriginSecret}]
+        OriginGroups:
+          Quantity: 1
+          Items:
+            - Id: board-with-failover   # if the API fails, the same path is served from the S3 snapshot
+              FailoverCriteria: {StatusCodes: {Quantity: 4, Items: [500, 502, 503, 504]}}
+              Members: {Quantity: 2, Items: [{OriginId: api}, {OriginId: site}]}
+        CustomErrorResponses:   # a page that does not exist is a 404 with a page, not S3's bare 403
+          - {ErrorCode: 403, ResponseCode: 404, ResponsePagePath: /404.html, ErrorCachingMinTTL: 60}
+        DefaultCacheBehavior:
+          TargetOriginId: site
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6          # CachingOptimized
+          Compress: true
+          ResponseHeadersPolicyId: 67f7725c-6f97-4210-82d7-5512b31e9d03   # SecurityHeadersPolicy: HSTS, nosniff, frame options, referrer
+          FunctionAssociations: [{EventType: viewer-request, FunctionARN: !GetAtt IndexRewrite.FunctionMetadata.FunctionARN}]
+        CacheBehaviors:
+          - PathPattern: /api/exposures
+            TargetOriginId: board-with-failover
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods: [GET, HEAD]
+            CachePolicyId: !Ref ApiCache
+            OriginRequestPolicyId: !Ref ApiOriginRequest
+            ResponseHeadersPolicyId: 67f7725c-6f97-4210-82d7-5512b31e9d03
+          - PathPattern: /api/*
+            TargetOriginId: api
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
+            CachePolicyId: !Ref ApiCache
+            OriginRequestPolicyId: !Ref ApiOriginRequest
+            ResponseHeadersPolicyId: 67f7725c-6f97-4210-82d7-5512b31e9d03
+
+  ApiCache:   # the API decides: the board and status say max-age=60 and are shared; everything else says no-store
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Sub "${AWS::StackName}-api"
+        MinTTL: 0
+        DefaultTTL: 0
+        MaxTTL: 300
+        ParametersInCacheKeyAndForwardedToOrigin:
+          EnableAcceptEncodingGzip: true
+          EnableAcceptEncodingBrotli: true
+          HeadersConfig: {HeaderBehavior: none}
+          CookiesConfig: {CookieBehavior: none}
+          QueryStringsConfig: {QueryStringBehavior: all}
+
+  ApiOriginRequest:   # the visitor's real address, for the per-visitor limits; never the Host header
+    Type: AWS::CloudFront::OriginRequestPolicy
+    Properties:
+      OriginRequestPolicyConfig:
+        Name: !Sub "${AWS::StackName}-api"
+        HeadersConfig: {HeaderBehavior: whitelist, Headers: [CloudFront-Viewer-Address, Origin, Content-Type, Accept]}
+        CookiesConfig: {CookieBehavior: none}
+        QueryStringsConfig: {QueryStringBehavior: all}
+
+  SiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: {Service: cloudfront.amazonaws.com}
+            Action: s3:GetObject
+            Resource: !Sub "${SiteBucket.Arn}/*"
+            Condition: {StringEquals: {AWS:SourceArn: !Sub "arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${Distribution}"}}
+
+  # ---------- observability: one dashboard, saved log queries (the public /ops/ page reads the same metrics) ----------
+  OpsDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub "${AWS::StackName}-ops"
+      DashboardBody: !Sub |
+        {"start": "-PT24H", "periodOverride": "inherit", "widgets": [
+          {"type": "text", "x": 0, "y": 0, "width": 24, "height": 2, "properties": {"markdown": "## ${AWS::StackName}: reading notices, matching trips, running clocks\nEvery number here is also on the public page **/ops/**. Custom metrics are Embedded Metric Format log lines (src/obs.py); traces are X-Ray."}},
+          {"type": "alarm", "x": 0, "y": 2, "width": 24, "height": 3, "properties": {"title": "Alarms", "alarms": ["${SourcesFailingAlarm.Arn}", "${ReadFailedAlarm.Arn}", "${ReadsStoppedAlarm.Arn}", "${MatcherFailedAlarm.Arn}", "${MatcherLaggingAlarm.Arn}", "${ClockFailedAlarm.Arn}", "${ApiErrorsAlarm.Arn}", "${ModelSpendAlarm.Arn}"]}},
+          {"type": "metric", "x": 0, "y": 5, "width": 8, "height": 6, "properties": {"title": "Reading: pages and windows", "region": "${AWS::Region}", "view": "timeSeries", "stacked": false, "period": 1800, "stat": "Sum", "metrics": [["SeventyTwo", "SourceRead"], [".", "SourceFailed"], [".", "WindowsFound"], [".", "WindowsRejected"]]}},
+          {"type": "metric", "x": 8, "y": 5, "width": 8, "height": 6, "properties": {"title": "Claude: spend (USD) and latency", "region": "${AWS::Region}", "view": "timeSeries", "period": 3600, "metrics": [["SeventyTwo", "ModelCostUSD", {"stat": "Sum", "label": "spend"}], [".", "ModelLatencyMs", {"stat": "p95", "yAxis": "right", "label": "latency p95"}]]}},
+          {"type": "metric", "x": 16, "y": 5, "width": 8, "height": 6, "properties": {"title": "Workflows", "region": "${AWS::Region}", "view": "timeSeries", "period": 3600, "stat": "Sum", "metrics": [["AWS/States", "ExecutionsStarted", "StateMachineArn", "${IngestStateMachine}", {"label": "reads started"}], [".", "ExecutionsFailed", ".", ".", {"label": "reads failed"}], [".", "ExecutionsStarted", ".", "${ClockStateMachine}", {"label": "clocks started"}], [".", "ExecutionsFailed", ".", ".", {"label": "clocks failed"}]]}},
+          {"type": "metric", "x": 0, "y": 11, "width": 8, "height": 6, "properties": {"title": "Matcher: per new window", "region": "${AWS::Region}", "view": "timeSeries", "period": 300, "metrics": [["SeventyTwo", "MatchWindowMs", {"stat": "p95"}], [".", "StoredToMatchedMs", {"stat": "Maximum"}], [".", "MatcherIndexItems", {"stat": "Maximum", "yAxis": "right"}], [".", "MatcherTripsRead", {"stat": "Maximum", "yAxis": "right"}]]}},
+          {"type": "metric", "x": 8, "y": 11, "width": 8, "height": 6, "properties": {"title": "Stream lag and trip matches", "region": "${AWS::Region}", "view": "timeSeries", "period": 300, "metrics": [["AWS/Lambda", "IteratorAge", "FunctionName", "${MatcherFunction}", {"stat": "Maximum"}], ["SeventyTwo", "TripMatches", {"stat": "Sum", "yAxis": "right"}], [".", "PushSent", {"stat": "Sum", "yAxis": "right"}]]}},
+          {"type": "metric", "x": 16, "y": 11, "width": 8, "height": 6, "properties": {"title": "Clock: how late each window closed (ms)", "region": "${AWS::Region}", "view": "timeSeries", "period": 3600, "metrics": [["SeventyTwo", "DeadlineSlipMs", {"stat": "Maximum"}], ["...", {"stat": "Average"}], ["...", {"stat": "SampleCount", "yAxis": "right", "label": "windows closed"}]]}},
+          {"type": "metric", "x": 0, "y": 17, "width": 12, "height": 6, "properties": {"title": "API: requests, errors, latency", "region": "${AWS::Region}", "view": "timeSeries", "period": 300, "metrics": [["AWS/ApiGateway", "Count", "ApiId", "${Api}", {"stat": "Sum"}], [".", "4xx", ".", ".", {"stat": "Sum"}], [".", "5xx", ".", ".", {"stat": "Sum"}], [".", "Latency", ".", ".", {"stat": "p99", "yAxis": "right"}], ["SeventyTwo", "CheckLatencyMs", {"stat": "p95", "yAxis": "right"}]]}},
+          {"type": "metric", "x": 12, "y": 17, "width": 12, "height": 6, "properties": {"title": "Lambda: errors, throttles, p95 duration", "region": "${AWS::Region}", "view": "timeSeries", "period": 300, "metrics": [["AWS/Lambda", "Errors", "FunctionName", "${ApiFunction}", {"stat": "Sum"}], ["...", "${IngestFunction}", {"stat": "Sum"}], ["...", "${MatcherFunction}", {"stat": "Sum"}], ["...", "${ClockFunction}", {"stat": "Sum"}], [".", "Throttles", ".", "${ApiFunction}", {"stat": "Sum"}], [".", "Duration", ".", "${ApiFunction}", {"stat": "p95", "yAxis": "right"}], ["...", "${IngestFunction}", {"stat": "p95", "yAxis": "right"}]]}},
+          {"type": "metric", "x": 0, "y": 23, "width": 12, "height": 6, "properties": {"title": "DynamoDB: capacity used and throttles", "region": "${AWS::Region}", "view": "timeSeries", "period": 300, "stat": "Sum", "metrics": [["AWS/DynamoDB", "ConsumedReadCapacityUnits", "TableName", "${Table}"], [".", "ConsumedWriteCapacityUnits", ".", "."], [".", "ReadThrottleEvents", ".", "."], [".", "WriteThrottleEvents", ".", "."]]}},
+          {"type": "metric", "x": 12, "y": 23, "width": 12, "height": 6, "properties": {"title": "CloudFront: requests and error rate", "region": "us-east-1", "view": "timeSeries", "period": 300, "metrics": [["AWS/CloudFront", "Requests", "DistributionId", "${Distribution}", "Region", "Global", {"stat": "Sum"}], [".", "TotalErrorRate", ".", ".", ".", ".", {"stat": "Average", "yAxis": "right"}]]}},
+          {"type": "log", "x": 0, "y": 29, "width": 24, "height": 6, "properties": {"title": "Matcher: the work for each new window", "region": "${AWS::Region}", "view": "table", "query": "SOURCE '/${AWS::StackName}/matcher' | fields @timestamp, window, state, index_items, trips_read, matches, ms, stored_to_matched_ms | filter matcher = 'window' | sort @timestamp desc | limit 50"}}
+        ]}
+
+  QueryMatcher:
+    Type: AWS::Logs::QueryDefinition
+    Properties:
+      Name: !Sub "${AWS::StackName}/matcher: work per new window"
+      LogGroupNames: [!Ref MatcherLogs]
+      QueryString: "fields @timestamp, window, state, drill, index_items, trips_read, matches, ms, stored_to_matched_ms | filter matcher = 'window' | sort @timestamp desc | limit 100"
+
+  QueryClaude:
+    Type: AWS::Logs::QueryDefinition
+    Properties:
+      Name: !Sub "${AWS::StackName}/claude: spend and latency by hour"
+      LogGroupNames: [!Ref IngestLogs, !Ref ApiLogs]
+      QueryString: "filter ispresent(ModelCostUSD) | stats count() as calls, sum(ModelCostUSD) as usd, pct(ModelLatencyMs, 50) as p50_ms, pct(ModelLatencyMs, 95) as p95_ms by bin(1h)"
+
+  QueryErrors:
+    Type: AWS::Logs::QueryDefinition
+    Properties:
+      Name: !Sub "${AWS::StackName}/errors and warnings, every function"
+      LogGroupNames: [!Ref ApiLogs, !Ref IngestLogs, !Ref MatcherLogs, !Ref ClockLogs, !Ref SnapshotLogs]
+      QueryString: "fields @timestamp, @log, level, route, error, push_failed, email_failed, @message | filter level = 'error' or level = 'warn' or @message like /Task timed out|Traceback/ | sort @timestamp desc | limit 100"
+
+  QueryPush:
+    Type: AWS::Logs::QueryDefinition
+    Properties:
+      Name: !Sub "${AWS::StackName}/push: what push services answered"
+      LogGroupNames: [!Ref MatcherLogs, !Ref ClockLogs, !Ref ApiLogs]
+      QueryString: "filter ispresent(push) | stats count() as sent by push, status"
+
+  QueryClock:
+    Type: AWS::Logs::QueryDefinition
+    Properties:
+      Name: !Sub "${AWS::StackName}/clock: how late each window closed"
+      LogGroupNames: [!Ref ClockLogs]
+      QueryString: "filter ispresent(DeadlineSlipMs) | stats count() as windows, avg(DeadlineSlipMs) as avg_ms, max(DeadlineSlipMs) as max_ms, min(DeadlineSlipMs) as min_ms by bin(1h)"
+
+  DistributionIdParam:   # the API reads CloudFront's metrics by this id (a direct reference would be a loop)
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${AWS::StackName}/distribution-id"
+      Type: String
+      Value: !Ref Distribution
+
+Outputs:
+  SiteUrl: {Value: !Sub "https://${Distribution.DomainName}"}
+  ApiUrl: {Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com"}
+  SiteBucketName: {Value: !Ref SiteBucket}
+  ArchiveBucketName: {Value: !Ref ArchiveBucket}
+  IngestStateMachineArn: {Value: !Ref IngestStateMachine}
+  ClockStateMachineArn: {Value: !Ref ClockStateMachine}
+  DistributionId: {Value: !Ref Distribution}
+  TableName: {Value: !Ref Table}
+  ApiFunctionName: {Value: !Ref ApiFunction}
+  IngestFunctionName: {Value: !Ref IngestFunction}
+  AlarmTopicArn: {Value: !Ref AlarmTopic}
+  DashboardUrl: {Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards/dashboard/${AWS::StackName}-ops"}

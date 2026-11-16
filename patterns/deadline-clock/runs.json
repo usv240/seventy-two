@@ -1,0 +1,74 @@
+[
+ {
+  "at": "2026-11-15T19:19:58.800548Z",
+  "clock": "5a16b1af1eb0",
+  "return the item": "Acted",
+  "claim the refund": "Missed",
+  "missed_window_closed_s_after_deadline": 0.59,
+  "deploy_s": 90,
+  "passed": true
+ },
+ {
+  "at": "2026-11-15T21:32:37.863463Z",
+  "clock": "order-2ef321c4",
+  "return the item": "Acted",
+  "claim the refund": "Missed",
+  "missed_window_closed_s_after_deadline": 0.21,
+  "acted_through": "the one-click link in the reminder",
+  "link": {
+   "opened_shows_button": true,
+   "pressed_records": true,
+   "pressed_s_after_reminder": 0.59
+  },
+  "messages_on_topic": [
+   "claim the refund: missed",
+   "claim the refund: reminder",
+   "return the item: acted",
+   "return the item: reminder"
+  ],
+  "passed": true,
+  "deploy_s": 91
+ },
+ {
+  "at": "2026-11-15T21:32:37.918257Z",
+  "clock": "order-132e44cc",
+  "return the item": "Acted",
+  "claim the refund": "Missed",
+  "missed_window_closed_s_after_deadline": 0.58,
+  "acted_through": "the one-click link in the reminder",
+  "link": {
+   "opened_shows_button": true,
+   "pressed_records": true,
+   "pressed_s_after_reminder": 1.02
+  },
+  "messages_on_topic": [
+   "claim the refund: missed",
+   "claim the refund: reminder",
+   "return the item: acted",
+   "return the item: reminder"
+  ],
+  "passed": true,
+  "deploy_s": 91
+ },
+ {
+  "at": "2026-11-15T21:32:37.974039Z",
+  "clock": "order-395d7787",
+  "return the item": "Acted",
+  "claim the refund": "Missed",
+  "missed_window_closed_s_after_deadline": 0.51,
+  "acted_through": "the one-click link in the reminder",
+  "link": {
+   "opened_shows_button": true,
+   "pressed_records": true,
+   "pressed_s_after_reminder": 0.29
+  },
+  "messages_on_topic": [
+   "claim the refund: missed",
+   "claim the refund: reminder",
+   "return the item: acted",
+   "return the item: reminder"
+  ],
+  "passed": true,
+  "deploy_s": 91
+ }
+]

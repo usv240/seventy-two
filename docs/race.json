@@ -1,0 +1,1222 @@
+{
+ "test": "race",
+ "at": "2026-11-16T00:05:34+00:00",
+ "what": "100 clocks; 'I acted' sent to each within a second either side of its deadline",
+ "clocks": 100,
+ "ended_exactly_once": 100,
+ "ended_twice_or_never": 0,
+ "acted": 32,
+ "missed": 68,
+ "answer_agrees_with_outcome": 100,
+ "exactly_one_final_message": 100,
+ "latest_press_still_in_time_s": 0.144,
+ "earliest_press_too_late_s": -0.852,
+ "press_sent_s_after_deadline": {
+  "min": -0.973,
+  "median": -0.004,
+  "max": 0.986
+ },
+ "how": "bench/clock_race.py against patterns/deadline-clock, deployed then deleted; outcomes from each execution's history, messages from a queue on the topic",
+ "clocks_detail": [
+  {
+   "id": "race-b3224874",
+   "offset_s": -0.853,
+   "sent_s_after_deadline": -0.852,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-c1443ebf",
+   "offset_s": 0.189,
+   "sent_s_after_deadline": 0.19,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-720483af",
+   "offset_s": 0.979,
+   "sent_s_after_deadline": 0.98,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-53cf4614",
+   "offset_s": -0.312,
+   "sent_s_after_deadline": -0.311,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-51445d45",
+   "offset_s": 0.088,
+   "sent_s_after_deadline": 0.089,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-ad746b3a",
+   "offset_s": -0.251,
+   "sent_s_after_deadline": -0.25,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-83df08c5",
+   "offset_s": 0.479,
+   "sent_s_after_deadline": 0.48,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-eb7a7cba",
+   "offset_s": 0.371,
+   "sent_s_after_deadline": 0.373,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-e1aafba0",
+   "offset_s": 0.197,
+   "sent_s_after_deadline": 0.197,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-0043f9b6",
+   "offset_s": 0.952,
+   "sent_s_after_deadline": 0.953,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-8f1159e9",
+   "offset_s": 0.406,
+   "sent_s_after_deadline": 0.407,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-77e3dae9",
+   "offset_s": -0.314,
+   "sent_s_after_deadline": -0.314,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-1b3cbe8f",
+   "offset_s": -0.24,
+   "sent_s_after_deadline": -0.239,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-a3df1787",
+   "offset_s": 0.267,
+   "sent_s_after_deadline": 0.268,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-e567c251",
+   "offset_s": 0.384,
+   "sent_s_after_deadline": 0.384,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-14ee84ed",
+   "offset_s": -0.556,
+   "sent_s_after_deadline": -0.555,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-1675b5b2",
+   "offset_s": 0.618,
+   "sent_s_after_deadline": 0.619,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-54f63123",
+   "offset_s": -0.106,
+   "sent_s_after_deadline": -0.106,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-98e390f6",
+   "offset_s": 0.545,
+   "sent_s_after_deadline": 0.546,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-2cd88f85",
+   "offset_s": -0.818,
+   "sent_s_after_deadline": -0.818,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-ef1193d8",
+   "offset_s": -0.365,
+   "sent_s_after_deadline": -0.363,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-394245bd",
+   "offset_s": -0.964,
+   "sent_s_after_deadline": -0.964,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-3e6b7d44",
+   "offset_s": -0.166,
+   "sent_s_after_deadline": -0.165,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-c26f800d",
+   "offset_s": -0.492,
+   "sent_s_after_deadline": -0.491,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-3560c78a",
+   "offset_s": -0.306,
+   "sent_s_after_deadline": -0.305,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-7128a483",
+   "offset_s": -0.559,
+   "sent_s_after_deadline": -0.558,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-44264f13",
+   "offset_s": 0.703,
+   "sent_s_after_deadline": 0.703,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-eea809b8",
+   "offset_s": 0.27,
+   "sent_s_after_deadline": 0.271,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-bde1dad1",
+   "offset_s": -0.3,
+   "sent_s_after_deadline": -0.299,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-4f48a4d2",
+   "offset_s": -0.005,
+   "sent_s_after_deadline": -0.004,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-ac69d277",
+   "offset_s": -0.63,
+   "sent_s_after_deadline": -0.63,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-ac9082be",
+   "offset_s": 0.885,
+   "sent_s_after_deadline": 0.888,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-c1879240",
+   "offset_s": 0.811,
+   "sent_s_after_deadline": 0.814,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-ad14a7f8",
+   "offset_s": 0.143,
+   "sent_s_after_deadline": 0.144,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-4582aad1",
+   "offset_s": -0.693,
+   "sent_s_after_deadline": -0.689,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-15881ef5",
+   "offset_s": 0.906,
+   "sent_s_after_deadline": 0.913,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-cd6743a1",
+   "offset_s": -0.567,
+   "sent_s_after_deadline": -0.561,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-9b50611a",
+   "offset_s": -0.89,
+   "sent_s_after_deadline": -0.888,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-a827bc4a",
+   "offset_s": -0.163,
+   "sent_s_after_deadline": -0.149,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-845e7f2c",
+   "offset_s": -0.245,
+   "sent_s_after_deadline": -0.244,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-fa2ea23d",
+   "offset_s": 0.7,
+   "sent_s_after_deadline": 0.701,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-045bc140",
+   "offset_s": -0.707,
+   "sent_s_after_deadline": -0.706,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-be8887c1",
+   "offset_s": -0.878,
+   "sent_s_after_deadline": -0.877,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-6bf23d42",
+   "offset_s": -0.117,
+   "sent_s_after_deadline": -0.117,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-977aa9fc",
+   "offset_s": -0.917,
+   "sent_s_after_deadline": -0.916,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-92e84acd",
+   "offset_s": 0.326,
+   "sent_s_after_deadline": 0.326,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-04fe15cd",
+   "offset_s": -0.024,
+   "sent_s_after_deadline": -0.023,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-dfd1b12d",
+   "offset_s": 0.748,
+   "sent_s_after_deadline": 0.754,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-279b6922",
+   "offset_s": 0.871,
+   "sent_s_after_deadline": 0.872,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-24cc610e",
+   "offset_s": -0.531,
+   "sent_s_after_deadline": -0.53,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-138f3e8a",
+   "offset_s": 0.574,
+   "sent_s_after_deadline": 0.574,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-1e05af2a",
+   "offset_s": -0.001,
+   "sent_s_after_deadline": -0.001,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-de647bb9",
+   "offset_s": 0.901,
+   "sent_s_after_deadline": 0.902,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-2a1bea4a",
+   "offset_s": -0.841,
+   "sent_s_after_deadline": -0.838,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-2be9a362",
+   "offset_s": -0.087,
+   "sent_s_after_deadline": -0.086,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-f874288a",
+   "offset_s": 0.961,
+   "sent_s_after_deadline": 0.961,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-639e9095",
+   "offset_s": -0.888,
+   "sent_s_after_deadline": -0.887,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-b410b1e5",
+   "offset_s": -0.391,
+   "sent_s_after_deadline": -0.39,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-29b9b19f",
+   "offset_s": -0.381,
+   "sent_s_after_deadline": -0.38,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-e3c13bbd",
+   "offset_s": -0.276,
+   "sent_s_after_deadline": -0.275,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-adbc56b9",
+   "offset_s": 0.985,
+   "sent_s_after_deadline": 0.986,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-998392bc",
+   "offset_s": -0.618,
+   "sent_s_after_deadline": -0.617,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-2e713385",
+   "offset_s": 0.647,
+   "sent_s_after_deadline": 0.648,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-33df0147",
+   "offset_s": -0.466,
+   "sent_s_after_deadline": -0.465,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-ee7b3ac3",
+   "offset_s": 0.749,
+   "sent_s_after_deadline": 0.749,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-d5c80e4c",
+   "offset_s": -0.706,
+   "sent_s_after_deadline": -0.705,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-04060363",
+   "offset_s": -0.799,
+   "sent_s_after_deadline": -0.799,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-79c79dc7",
+   "offset_s": 0.972,
+   "sent_s_after_deadline": 0.973,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-a0e7bba1",
+   "offset_s": -0.974,
+   "sent_s_after_deadline": -0.973,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-13939c2d",
+   "offset_s": 0.284,
+   "sent_s_after_deadline": 0.285,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-026b21a7",
+   "offset_s": -0.592,
+   "sent_s_after_deadline": -0.584,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-fb562ea2",
+   "offset_s": 0.157,
+   "sent_s_after_deadline": 0.157,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-8257b737",
+   "offset_s": -0.365,
+   "sent_s_after_deadline": -0.365,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-deeb3fcc",
+   "offset_s": 0.248,
+   "sent_s_after_deadline": 0.249,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-5217e700",
+   "offset_s": 0.356,
+   "sent_s_after_deadline": 0.357,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-4b4d0efe",
+   "offset_s": 0.5,
+   "sent_s_after_deadline": 0.501,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-50d10bcb",
+   "offset_s": -0.757,
+   "sent_s_after_deadline": -0.756,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-57609d1f",
+   "offset_s": 0.658,
+   "sent_s_after_deadline": 0.66,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-01a323a2",
+   "offset_s": -0.522,
+   "sent_s_after_deadline": -0.521,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-a92780cb",
+   "offset_s": 0.187,
+   "sent_s_after_deadline": 0.188,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-2ec89a04",
+   "offset_s": 0.619,
+   "sent_s_after_deadline": 0.62,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-db1becdc",
+   "offset_s": 0.544,
+   "sent_s_after_deadline": 0.546,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-b7cd15f8",
+   "offset_s": 0.061,
+   "sent_s_after_deadline": 0.061,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-71e891e3",
+   "offset_s": -0.005,
+   "sent_s_after_deadline": -0.004,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-4d826778",
+   "offset_s": -0.692,
+   "sent_s_after_deadline": -0.691,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-70d62c9c",
+   "offset_s": 0.759,
+   "sent_s_after_deadline": 0.76,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-bd408090",
+   "offset_s": 0.189,
+   "sent_s_after_deadline": 0.19,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-80e9d526",
+   "offset_s": 0.543,
+   "sent_s_after_deadline": 0.544,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-ab73ba26",
+   "offset_s": 0.933,
+   "sent_s_after_deadline": 0.934,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-a6ac7340",
+   "offset_s": 0.401,
+   "sent_s_after_deadline": 0.401,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-54de1e4e",
+   "offset_s": -0.4,
+   "sent_s_after_deadline": -0.399,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-2da85357",
+   "offset_s": -0.039,
+   "sent_s_after_deadline": -0.039,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-7bd06de8",
+   "offset_s": -0.655,
+   "sent_s_after_deadline": -0.653,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-bbb366a7",
+   "offset_s": -0.445,
+   "sent_s_after_deadline": -0.443,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-1528349f",
+   "offset_s": 0.715,
+   "sent_s_after_deadline": 0.715,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-3718de35",
+   "offset_s": 0.337,
+   "sent_s_after_deadline": 0.337,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-6400c8e2",
+   "offset_s": -0.666,
+   "sent_s_after_deadline": -0.662,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-04525930",
+   "offset_s": 0.043,
+   "sent_s_after_deadline": 0.044,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  },
+  {
+   "id": "race-608daee1",
+   "offset_s": -0.182,
+   "sent_s_after_deadline": -0.181,
+   "in_time": true,
+   "ended": [
+    "Acted"
+   ],
+   "final_messages": [
+    "acted"
+   ]
+  },
+  {
+   "id": "race-41d5f25a",
+   "offset_s": 0.632,
+   "sent_s_after_deadline": 0.633,
+   "in_time": false,
+   "ended": [
+    "Missed"
+   ],
+   "final_messages": [
+    "missed"
+   ]
+  }
+ ]
+}

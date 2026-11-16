@@ -1,0 +1,263 @@
+<!-- page {"title": "The stack: everything that runs Seventy-Two", "description": "Every AWS service, the AI model, the code, the site and the deploy tools behind Seventy-Two, with what each one does and how it is set up.", "nav": "stack", "scripts": ["/assets/stack.js"]} -->
+<main id="main" class="stack">
+  <section class="app-top">
+    <div class="wrap split">
+      <div class="span-7">
+        <h1 class="page-title">The stack</h1>
+        <p class="lead">Everything that runs Seventy-Two, behind the scenes: every AWS service, the AI model, the code, this site and the tools that deploy it. What each one does, and how it is set up.</p>
+      </div>
+      <div class="span-5 side-note">
+        <p class="live-run" id="live-run" aria-live="polite">Live: see each source's last read on <a href="/board/#status">the board</a>.</p>
+        <p class="small">For how the pieces connect, step by step, see <a href="/learn/#built">How it is built</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="tally-band" aria-label="The stack in four numbers">
+    <div class="wrap">
+      <ul class="tally" data-ui>
+        <li><span class="tally-n">10</span><span class="tally-l">AWS services do the work <span data-info-for="serverless"></span></span></li>
+        <li><span class="tally-n">1</span><span class="tally-l">AI model, Claude Haiku 4.5 <span data-info-for="bedrock"></span></span></li>
+        <li><span class="tally-n">0</span><span class="tally-l">servers, containers or deployment pipelines</span></li>
+        <li><span class="tally-n">1</span><span class="tally-l">command to deploy all of it <span data-info-for="sam"></span></span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="stack-group" aria-labelledby="g-aws">
+    <div class="wrap">
+      <header class="group-head"><h2 id="g-aws">AWS services that do the work</h2><p>Ten managed services. Nothing to patch, and nothing runs unless something calls for it: the half-hourly read, a new exposure window, a clock's deadline or a visitor.</p></header>
+      <div class="stack-rows" role="list">
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">EventBridge Scheduler <span data-info-for="scheduler"></span></h3>
+          <p class="stack-what">Starts the reading workflow every 30 minutes, so nobody has to press anything.</p>
+          <p class="stack-how"><code>rate(30 minutes)</code>, with a 5-minute flexible window.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">Step Functions <span data-info-for="step-functions"></span></h3>
+          <p class="stack-what">Two workflows. The reading workflow reads every source in parallel, then publishes the board. The clock workflow runs once per person, over the list of deadlines in the code.</p>
+          <p class="stack-how">Standard workflows. A Distributed Map runs each source as a short Express child, 6 at a time, retries a failed page with jittered backoff, and carries on if up to half fail. The clock is a Map over the deadlines: each is a Wait state on an exact time, and each "did you act?" is a task token whose timeout is the deadline. Every clock step retries.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">Lambda <span data-info-for="lambda"></span></h3>
+          <p class="stack-what">Five functions: read one source, publish the board snapshot, answer the website's API, match new windows to saved trips, and run each clock step.</p>
+          <p class="stack-how">Python 3.12 on arm64 (Graviton), 512 MB to 1.7 GB (the matcher gets one full vCPU, for an airport exposure with hundreds of matches), one shared layer. Billed by the millisecond.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">Bedrock <span data-info-for="bedrock"></span></h3>
+          <p class="stack-what">Runs Claude Haiku 4.5 for two jobs: reading notices, and turning your trip into places and times.</p>
+          <p class="stack-how">The US cross-region inference profile, so your words stay in US Regions. Temperature 0, and every call is a forced tool call, so the answer always comes back as structured data that code can check.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">DynamoDB <span data-info-for="dynamodb"></span></h3>
+          <p class="stack-what">One table holds exposure windows, sources, saved trips, clocks, Lab results and request counters.</p>
+          <p class="stack-how">On-demand billing, one secondary index, encrypted at rest. Time to live deletes saved trips, clocks, Lab results and counters on schedule.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">DynamoDB Streams <span data-info-for="streams"></span></h3>
+          <p class="stack-what">Sends each new exposure window to the matcher the moment it is stored, so a saved trip hears about it without anyone checking.</p>
+          <p class="stack-how">A filter passes only INSERTs of window items. Reading a notice again rewrites the same item, so it never re-sends. Saved stops are indexed by state and day, so the matcher reads only the trips that could match. Batches retry three times, split in half on error, and anything left goes to SQS. In a drill, a new window reached a saved trip in 5.3 seconds.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">S3 <span data-info-for="s3"></span></h3>
+          <p class="stack-what">Two buckets. One holds this website and the board backup. The other keeps every notice read, filed by a hash of its text, and the list of sources.</p>
+          <p class="stack-how">Public access blocked on both; the site is reached only through CloudFront. The notice archive is encrypted.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">API Gateway <span data-info-for="api-gateway"></span></h3>
+          <p class="stack-what">An HTTP API with 15 routes: the board, one exposure, a check, saving, reading and deleting a trip, its calendar feed, alerts for a trip or a clock, the push key, starting and reading a clock, "I got it", the Lab and status.</p>
+          <p class="stack-how">Every route is throttled to 20 requests a second, bursts of 50. Checks, saved trips, alerts, clocks and the Lab also have a daily limit per visitor, counted under a scrambled form of the visitor's own address. Calls that skip CloudFront are refused.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">CloudFront <span data-info-for="cloudfront"></span></h3>
+          <p class="stack-what">Serves the site over HTTPS and sends API calls to API Gateway.</p>
+          <p class="stack-how">Origin access control to the private bucket. A CloudFront Function maps folder addresses to pages. An origin group serves the S3 board snapshot if the API returns 500, 502, 503 or 504; in a drill with the API returning 503, it served the same 20 rows. The board and status are cached for a minute; everything personal is never cached. HTTP/2 and HTTP/3, compressed.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">SQS</h3>
+          <p class="stack-what">Records any stream batch the matcher could not finish, even after retries, so a failure is never silent.</p>
+          <p class="stack-how">The stream's on-failure destination: it keeps where the batch was in the stream, for 14 days, encrypted. An alarm fires if one arrives, and <code>scripts/replay.py</code> runs the matcher again over the windows from that time.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="stack-group field-band" aria-labelledby="g-support">
+    <div class="wrap">
+      <header class="group-head"><h2 id="g-support">AWS services that support it</h2><p>Describing, watching, tracing and locking down the ten above.</p></header>
+      <div class="stack-rows" role="list">
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">SAM and CloudFormation <span data-info-for="sam"></span></h3>
+          <p class="stack-what">One template, <code>template.yaml</code>, describes every resource on this page.</p>
+          <p class="stack-how">Deployed as a CloudFormation change set, created and applied by the deploy script. No SAM CLI needed.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">X-Ray <span data-info-for="xray"></span></h3>
+          <p class="stack-what">Traces a sample of every function's runs (the first each second and 5% of the rest) and both workflows, with a part for each DynamoDB, S3 and SSM call, each Claude call, each page fetched and each push sent, so a slow source or a slow model call shows up in one view. Its service map, kept to this stack, is drawn on <a href="/ops/">the Ops page</a>.</p>
+          <p class="stack-how">Active tracing on all five functions and both state machines, plus the X-Ray SDK in the layer. Outside calls are named by host only. A trace of the matcher found its own bottleneck in a scale test: 300 writes waiting on a third of a CPU.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">CloudWatch and SNS <span data-info-for="alarms"></span></h3>
+          <p class="stack-what">Logs every function run and turns log lines into metrics: pages read and failed, new windows and dropped proposals, Claude's cost and latency, check time, matching work per window, stored-to-matched time, pushes, and how late each clock window closed. Eight alarms: pages failing three runs in a row, a run failing, reads stopping (silence counts as failure), a clock failing, a batch the matcher could not finish, new windows waiting over a minute, the API answering with errors, and Claude spending over $1 an hour. One dashboard and five saved Logs Insights queries.</p>
+          <p class="stack-how">Metrics are Embedded Metric Format log lines, with no extra API calls. Everything is shown on <a href="/ops/">the Ops page</a>, read from CloudWatch at most every 10 minutes; the alarms are also on <a href="/board/#status">the status panel</a>, and SNS can email whoever runs the stack. Logs are kept 14 days.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">IAM <span data-info-for="iam"></span></h3>
+          <p class="stack-what">One role per function, granting only the table operations, buckets and workflows it uses. Only the API can start or resume a clock; only the reader and the API can call Bedrock, and only the one Claude Haiku 4.5 model; the board snapshot can write only its two files.</p>
+          <p class="stack-how">One role per function and per workflow, written in the template.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">SSM Parameter Store</h3>
+          <p class="stack-what">Holds the key that signs this site's push notifications, so only this site can send to your device.</p>
+          <p class="stack-how">A SecureString, made once by the deploy script. Never in the code or the template.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">SES <span class="off-tag">Off</span> <span data-info-for="ses"></span></h3>
+          <p class="stack-what">Email reminders from your clock.</p>
+          <p class="stack-how">Built in, and switched off until a sender address is verified. The clock page and the calendar file work without it.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="stack-group" aria-labelledby="g-ai">
+    <div class="wrap">
+      <header class="group-head"><h2 id="g-ai">The AI</h2><p>One small model that reads. Code decides everything that matters.</p></header>
+      <div class="stack-rows" role="list">
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">Claude Haiku 4.5 <span data-info-for="reader"></span></h3>
+          <p class="stack-what">Reads each changed notice and lists every place and time in it, each with the exact sentence it came from. Turns your trip description into places and times.</p>
+          <p class="stack-how"><code>us.anthropic.claude-haiku-4-5-20251001-v1:0</code>, a small, fast model. A notice costs a median of $0.006 to read; the 27-page benchmark costs $0.19.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">Anthropic Python SDK <span data-info-for="sdk"></span></h3>
+          <p class="stack-what">Calls Claude on Bedrock with two tools, <code>record_exposures</code> and <code>record_stops</code>, and forces the model to answer through one of them.</p>
+          <p class="stack-how">Version 1.17.0 through its Bedrock client, in a Lambda layer with tzdata.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">Checks in plain code <span data-info-for="quote"></span></h3>
+          <p class="stack-what">Every proposed window must quote the notice word for word, its date must be written in or just above the quote, its place must be named within a few lines, its times must be inside the quote, and its time zone must fit its state, or it is dropped or widened. Whether you overlapped, merging, and every deadline are computed by code from the CDC's rules.</p>
+          <p class="stack-how">On the 11 notices it was developed against it matched 34 of 34 hand-labeled windows exactly, start and end times included. On 3 held-out notices from departments it does not read, 3 of 5, with 0 false; the other 2 were read as one two-day window that still covers both days. On 13 pages that are not notices, it created 0. Wrong dates, places and quotes are rejected 114 of 114 times.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="stack-group field-band" aria-labelledby="g-code">
+    <div class="wrap">
+      <header class="group-head"><h2 id="g-code">The code on Lambda</h2><p>Python and its standard library. No web framework.</p></header>
+      <div class="stack-rows" role="list">
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">Python 3.12</h3>
+          <p class="stack-what">Small modules: <code>ingest</code> fetches and finds new notices, <code>reader</code> asks Claude and <code>evidence</code> checks the answer against the text, <code>match</code> and <code>trips</code> compare a trip with each window, <code>watch</code> keeps saved trips and runs the matcher, <code>push</code> encrypts and signs notifications, <code>merge</code> joins reports of the same exposure, <code>board</code> builds the public board, <code>rules</code> runs the deadlines from a domain file (<code>domains/measles.py</code>, or <code>domains/hepatitis_a.py</code>), <code>clock</code> runs each clock step, <code>api</code> answers the site, <code>store</code> talks to DynamoDB, <code>obs</code> writes metrics and traces, <code>ops</code> reads them back for the Ops page, <code>textutil</code> cleans pages.</p>
+          <p class="stack-how">Standard library for the rest: <code>urllib</code> fetches pages, <code>html.parser</code> reads HTML and RSS, <code>hashlib</code> makes content hashes and ids, <code>zoneinfo</code> handles timezones, <code>ipaddress</code> keeps the Lab away from private addresses, <code>statistics</code> computes the median delay.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">boto3</h3>
+          <p class="stack-what">Talks to DynamoDB, S3 and Step Functions from inside the functions.</p>
+          <p class="stack-how">The copy that ships with the Lambda runtime, so the layer stays small. The AWS X-Ray SDK for Python, in the layer, traces its calls.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="stack-group" aria-labelledby="g-site">
+    <div class="wrap">
+      <header class="group-head"><h2 id="g-site">This website</h2><p>Plain HTML, CSS and JavaScript, served from S3 through CloudFront.</p></header>
+      <div class="stack-rows" role="list">
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">HTML, CSS, JavaScript</h3>
+          <p class="stack-what">Eight pages and a few small JavaScript modules. No framework and no bundler.</p>
+          <p class="stack-how">A short Python script, <code>scripts/render.py</code>, standard library only, adds the shared header and footer to each page.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">The departures board</h3>
+          <p class="stack-what">The split-flap letters on the board and in your result.</p>
+          <p class="stack-how">Drawn in JavaScript, and turned off when your device asks for reduced motion.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">Calendar files and feeds <span data-info-for="calendar-feed"></span></h3>
+          <p class="stack-what">Every deadline as an event in your own calendar, with an alarm 12 hours before. A saved trip also has a feed your calendar subscribes to, so a new match appears on its own, at the calendar's next refresh.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">Alerts on this device <span data-info-for="web-push"></span></h3>
+          <p class="stack-what">A notification on your phone or computer when a new notice matches your trip, or a deadline is a day away.</p>
+          <p class="stack-how">Web Push: a small service worker, messages encrypted to your browser's key (RFC 8291) and signed by this site (RFC 8292), checked against the RFC's own test vector. No account, no app, no email.</p>
+          <p class="stack-how">Files are made in your browser. The feed is built by the API from your trip, and is reachable only by its unguessable address.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">Light and dark</h3>
+          <p class="stack-what">Follows your device's setting, with a switch in the header.</p>
+          <p class="stack-how">CSS custom properties. Your browser keeps only that choice, and your last result while the tab is open.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">Bebas Neue and EB Garamond</h3>
+          <p class="stack-what">The board's letters, and the calm voice of a public notice.</p>
+          <p class="stack-how">From Google Fonts. Pictures are open-licence photographs and posters, credited in the footer.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="stack-group field-band" aria-labelledby="g-tools">
+    <div class="wrap">
+      <header class="group-head"><h2 id="g-tools">Building, deploying and checking</h2><p>All run from a laptop or AWS CloudShell.</p></header>
+      <div class="stack-rows" role="list">
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">deploy.py <span data-info-for="sam"></span></h3>
+          <p class="stack-what">The one command: <code>python scripts/deploy.py</code>. Builds, uploads, deploys the stack, uploads the source list and the site, and clears the CloudFront cache.</p>
+          <p class="stack-how">boto3 only. <code>build.py</code> packs the layer from arm64 wheels, with no Docker.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">pytest</h3>
+          <p class="stack-what">41 tests: the CDC deadlines, the evidence checks, the clock plan, merging, trip matching, the stream matcher, Web Push against the RFC test vector, the API's own rules, and a second disease (hepatitis A) on the same code.</p>
+          <p class="stack-how"><code>python -m pytest tests</code></p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">The reader benchmark</h3>
+          <p class="stack-what">Runs the reader on real notices labeled by hand (two of them held out), on measles pages that are not notices, and on answers broken on purpose. A second script runs it on real hepatitis A notices.</p>
+          <p class="stack-how"><code>python bench/run.py</code>, <code>python bench/reuse.py</code></p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">stats.py and cost.py</h3>
+          <p class="stack-what">Count scheduled runs and their results, print the headline numbers from the live stack, and price a month from the stack's own metrics: about $3.60 at list price, about $1.65 inside the AWS Free Tier.</p>
+          <p class="stack-how"><code>python scripts/stats.py</code>, <code>python scripts/cost.py</code></p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">recheck.py and drill.py</h3>
+          <p class="stack-what">Re-check every stored window against its archived notice without calling the model, and prove on the live stack the failover, the whole trip path (a drill notice read by Claude, matched through the stream, pushed) and a real-speed clock closing its window at the deadline.</p>
+          <p class="stack-how"><code>python scripts/recheck.py</code>, <code>python scripts/drill.py failover</code>, <code>trip</code>, <code>clock</code></p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">scale.py <span data-info-for="scale-test"></span></h3>
+          <p class="stack-what">Load-tests the live stack: 10,000 saved trips and new windows through the real stream, an airport exposure that 300 trips passed through, 200 windows at once, 2,000 requests through CloudFront, and 50 real-speed clocks at once. Then it deletes what it made.</p>
+          <p class="stack-how"><code>python scripts/scale.py all</code>; results in <code>docs/scale.json</code> and on <a href="/ops/#scale">the Ops page</a>.</p>
+        </article>
+        <article class="stack-row" role="listitem">
+          <h3 class="stack-name">The demo video</h3>
+          <p class="stack-what">Recorded from this live site, start to finish, including a drill notice that the real ingest function reads while the trip page waits to flip.</p>
+          <p class="stack-how">Headless Chrome driven over the DevTools Protocol, narrated with Amazon Polly, put together with ffmpeg. Each caption stays up exactly as long as its line is spoken.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="stack-group" aria-labelledby="g-not">
+    <div class="wrap">
+      <header class="group-head"><h2 id="g-not">What it does not use</h2><p>Left out on purpose.</p></header>
+      <div class="board not-used" data-ui>
+        <table>
+          <caption>Each one would be something to look after.</caption>
+          <thead><tr><th scope="col" style="width:72%">What</th><th scope="col" style="width:28%">Status</th></tr></thead>
+          <tbody>
+            <tr><td class="place"><span class="flap">Servers, virtual machines, containers</span></td><td class="status-closed">Not used</td></tr>
+            <tr><td class="place"><span class="flap">A deployment pipeline</span></td><td class="status-closed">Not used</td></tr>
+            <tr><td class="place"><span class="flap">A frontend framework or bundler</span></td><td class="status-closed">Not used</td></tr>
+            <tr><td class="place"><span class="flap">Accounts, tracking cookies, analytics</span></td><td class="status-closed">Not used</td></tr>
+            <tr><td class="place"><span class="flap">An agent framework or a vector database</span></td><td class="status-closed">Not used</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>

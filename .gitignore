@@ -1,0 +1,21 @@
+.venv/
+build/
+dist/
+__pycache__/
+*.pyc
+.env
+.env.*
+.taste-skill/
+bench/pages/
+
+# local working notes and recording files, not part of the project
+PLAN.md
+PRODUCT.md
+TECHNICAL_DESIGN.md
+EXPERIENCE_DESIGN.md
+ARTICLE.md
+video/
+docs/cover.*
+scripts/try_reader.py
+*.mp4
+*.mp3

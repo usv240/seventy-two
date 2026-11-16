@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Seventy-Two architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=EB+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#111111; --surface:#1b1b1b; --box:#242424; --ink:#f2f2f2; --muted:#a9a49a; --line:#3a3a3a;
+          --read:#f1c14b; --check:#8fe3a2; --clock:#9ec5ff; --data:#d9d4c8; }
+  html,body { margin:0; background:var(--bg); color:var(--ink); font-family:"EB Garamond",Georgia,serif; }
+  .canvas { position:relative; width:1600px; height:1180px; }
+  h1 { position:absolute; left:80px; top:34px; margin:0; font-family:"Bebas Neue",sans-serif; font-weight:400; font-size:62px; line-height:0.9; letter-spacing:0.01em; }
+  .sub { position:absolute; left:80px; top:100px; margin:0; font-size:21px; color:var(--muted); }
+  .lane { position:absolute; left:0; width:62px; font-family:"Bebas Neue",sans-serif; font-size:20px; letter-spacing:0.08em;
+          writing-mode:vertical-rl; transform:rotate(180deg); text-align:center; color:var(--muted); }
+  .box { position:absolute; width:240px; height:112px; box-sizing:border-box; background:var(--box); padding:12px 14px 10px;
+         border-top:4px solid var(--c, var(--data)); }
+  .box b { display:block; font-family:"Bebas Neue",sans-serif; font-weight:400; font-size:25px; line-height:0.95; letter-spacing:0.02em; margin-bottom:5px; }
+  .box p { margin:0; font-size:16px; line-height:1.22; color:#d6d1c6; }
+  .box.data { background:#2b2925; }
+  .box.actor { background:transparent; border:1.5px dashed #5a5a5a; border-top:4px solid var(--c); }
+  .box.side { background:transparent; border:1.5px solid var(--line); border-top:4px solid #6d6d6d; }
+  svg { position:absolute; inset:0; overflow:visible; }
+  .n { font-family:"Bebas Neue",sans-serif; font-size:17px; }
+  .legend { position:absolute; left:80px; top:822px; width:1440px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:34px; }
+  .legend h2 { margin:0 0 8px; font-family:"Bebas Neue",sans-serif; font-weight:400; font-size:30px; letter-spacing:0.03em; }
+  .legend ol { margin:0; padding:0; list-style:none; display:grid; gap:6px; }
+  .legend li { font-size:17px; line-height:1.28; color:#dcd7cc; display:grid; grid-template-columns:30px 1fr; }
+  .legend li span { font-family:"Bebas Neue",sans-serif; font-size:19px; }
+  .foot { position:absolute; left:80px; top:1128px; font-size:17px; color:var(--muted); }
+  .foot b { color:var(--ink); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="canvas" id="c">
+  <h1>Seventy-Two: how the services connect</h1>
+  <p class="sub">Serverless on AWS. No servers, no deployment pipeline. One AWS SAM template, deployed with one command.</p>
+
+  <div class="lane" style="top:170px;height:112px">Read</div>
+  <div class="lane" style="top:335px;height:112px">Data</div>
+  <div class="lane" style="top:500px;height:112px">Check + watch</div>
+  <div class="lane" style="top:665px;height:112px">Clock</div>
+
+  <!-- row 0: read, every 30 minutes -->
+  <div class="box" id="sched" style="--c:var(--read)"><b>EventBridge Scheduler</b><p>rate(30 minutes). Nobody presses a button.</p></div>
+  <div class="box" id="ingest" style="--c:var(--read)"><b>Step Functions: ingest</b><p>Distributed Map. One Express run per source, 6 at a time, retries with backoff.</p></div>
+  <div class="box" id="read" style="--c:var(--read)"><b>Lambda: read a source</b><p>Fetches 31 health department pages. Unchanged text stops here.</p></div>
+  <div class="box" id="bedrock" style="--c:var(--read)"><b>Bedrock: Claude Haiku 4.5</b><p>Proposes windows, each with a quote. Code checks every one.</p></div>
+  <div class="box side" id="cw"><b>CloudWatch, X-Ray, SSM</b><p>Metrics from log lines, 8 alarms, traces; all public on the Ops page.</p></div>
+
+  <!-- row 1: data -->
+  <div class="box data" id="site"><b>S3: site bucket</b><p>The pages, and the board snapshot written after every read.</p></div>
+  <div class="box data" id="archive"><b>S3: archive bucket</b><p>The source list. Every notice read, kept by content hash.</p></div>
+  <div class="box data" id="ddb"><b>DynamoDB</b><p>Windows (ids from content), saved trips, clocks. TTL deletes visitor data.</p></div>
+  <div class="box data" id="streams"><b>DynamoDB Streams</b><p>Filtered to INSERTs of new windows. Re-reads never pass.</p></div>
+  <div class="box data" id="sqs"><b>SQS</b><p>Records any batch the matcher could not finish; a script replays it.</p></div>
+
+  <!-- row 2: check + watch -->
+  <div class="box" id="cf" style="--c:var(--check)"><b>CloudFront</b><p>HTTPS. If the API fails, serves the S3 snapshot on the same path.</p></div>
+  <div class="box" id="apigw" style="--c:var(--check)"><b>API Gateway (HTTP)</b><p>16 routes, throttled. Per-visitor limits. Only via CloudFront.</p></div>
+  <div class="box" id="api" style="--c:var(--check)"><b>Lambda: API</b><p>Claude turns your words into places and times. Code decides the match.</p></div>
+  <div class="box" id="matcher" style="--c:var(--check)"><b>Lambda: matcher</b><p>Reads only the stops saved in that state and day; writes and pushes 16 at a time.</p></div>
+
+  <!-- row 3: clock -->
+  <div class="box actor" id="you" style="--c:var(--check)"><b>You, on any device</b><p>Check a trip, watch it, get alerts, start a clock, press "I got it".</p></div>
+  <div class="box actor" id="cal" style="--c:var(--check)"><b>Your device</b><p>Gets the Web Push alert; your calendar fetches the trip feed.</p></div>
+  <div class="box" id="clock" style="--c:var(--clock)"><b>Step Functions: clock</b><p>One Standard run per person, any disease. A Map over its deadlines.</p></div>
+  <div class="box" id="steps" style="--c:var(--clock)"><b>Lambda: clock steps</b><p>Plans the deadlines from CDC rules; records each step.</p></div>
+
+  <svg id="wires" width="1600" height="1180"></svg>
+
+  <div class="legend">
+    <div>
+      <h2 style="color:var(--read)">Every 30 minutes</h2>
+      <ol>
+        <li><span>1</span>Scheduler starts the ingest workflow.</li>
+        <li><span>2</span>It reads the source list from S3.</li>
+        <li><span>3</span>One Lambda run per page, 6 at a time.</li>
+        <li><span>4</span>Only a changed page reaches Claude.</li>
+        <li><span>5</span>The page is archived by its hash.</li>
+        <li><span>6</span>Checked windows go to DynamoDB.</li>
+        <li><span>7</span>A snapshot Lambda writes the board to S3.</li>
+      </ol>
+    </div>
+    <div>
+      <h2 style="color:var(--check)">When you check, and after</h2>
+      <ol>
+        <li><span>8</span>CloudFront serves the site from S3.</li>
+        <li><span>9</span>Live requests go through API Gateway.</li>
+        <li><span>10</span>The API reads windows, saves your trip.</li>
+        <li><span>11</span>Claude reads your trip. Nothing else.</li>
+        <li><span>12</span>A new window enters the stream.</li>
+        <li><span>13</span>The matcher writes any match into your trip.</li>
+        <li><span>14</span>The matcher sends Web Push to your device.</li>
+      </ol>
+    </div>
+    <div>
+      <h2 style="color:var(--clock)">Your clock</h2>
+      <ol>
+        <li><span>15</span>The API starts your own workflow.</li>
+        <li><span>16</span>Each deadline: Wait, then remind.</li>
+        <li><span>17</span>"I got it" goes through the API, which sends the task token back.</li>
+        <li><span></span>No answer by the deadline: the token times out, and the window closes on its own.</li>
+        <li><span></span>The clock record deletes itself (TTL) the day after the watch ends.</li>
+      </ol>
+    </div>
+  </div>
+  <p class="foot"><b>Measured:</b> 34 of 34 labelled windows exact, 3 of 5 held out (0 false); 0 windows from 13 non-notice pages. With 10,000 saved trips, an ordinary new window reads 150 to 190 times less than reading every trip, same matches.</p>
+</div>
+<script>
+  const X = (i) => 80 + 300 * i, Y = (j) => 170 + 165 * j;
+  const place = { sched: [0,0], ingest: [1,0], read: [2,0], bedrock: [3,0], cw: [4,0],
+                  site: [0,1], archive: [1,1], ddb: [2,1], streams: [3,1], sqs: [4,1],
+                  cf: [0,2], apigw: [1,2], api: [2,2], matcher: [3,2],
+                  you: [0,3], cal: [1,3], clock: [2,3], steps: [3,3] };
+  for (const [id, [i, j]] of Object.entries(place)) Object.assign(document.getElementById(id).style, { left: X(i) + "px", top: Y(j) + "px" });
+  const W = 240, H = 112;
+  const pt = (id, side, f = 0.5) => {
+    const [i, j] = place[id], x = X(i), y = Y(j);
+    return { l: [x, y + H * f], r: [x + W, y + H * f], t: [x + W * f, y], b: [x + W * f, y + H] }[side];
+  };
+  const C = { read: "#f1c14b", check: "#8fe3a2", clock: "#9ec5ff" };
+  // [n, flow, from, side, f, to, side, f, label position 0..1]
+  const wires = [
+    [1, "read", "sched", "r", .5, "ingest", "l", .5],
+    [2, "read", "archive", "t", .5, "ingest", "b", .5],
+    [3, "read", "ingest", "r", .5, "read", "l", .5],
+    [4, "read", "read", "r", .5, "bedrock", "l", .5],
+    [5, "read", "read", "b", .2, "archive", "r", .25],
+    [6, "read", "read", "b", .6, "ddb", "t", .6],
+    [7, "read", "ingest", "b", .15, "site", "r", .25],
+    [8, "check", "cf", "t", .5, "site", "b", .5],
+    [9, "check", "cf", "r", .5, "apigw", "l", .5],
+    [9, "check", "apigw", "r", .5, "api", "l", .5],
+    [10, "check", "api", "t", .5, "ddb", "b", .5],
+    [11, "check", "api", "r", .15, "bedrock", "b", .22, "elbow"],
+    [12, "check", "ddb", "r", .5, "streams", "l", .5],
+    [12, "check", "streams", "b", .5, "matcher", "t", .5],
+    [13, "check", "matcher", "l", .75, "ddb", "b", .85, "elbow2"],
+    [null, "check", "matcher", "r", .3, "sqs", "b", .5, "elbow3"],
+    [null, "check", "you", "t", .5, "cf", "b", .5],
+    [null, "check", "cal", "t", .3, "cf", "r", .8, "elbow4"],
+    [14, "check", "matcher", "b", .25, "cal", "t", .75, "elbow5"],
+    [15, "clock", "api", "b", .5, "clock", "t", .5],
+    [16, "clock", "clock", "r", .5, "steps", "l", .5],
+    [17, "clock", "you", "r", .5, "cal", "l", .5, "skip"],
+  ];
+  const svg = document.getElementById("wires");
+  const ns = "http://www.w3.org/2000/svg";
+  const defs = document.createElementNS(ns, "defs");
+  for (const [k, c] of Object.entries(C)) {
+    defs.insertAdjacentHTML("beforeend", `<marker id="a-${k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${c}"/></marker>`);
+  }
+  svg.appendChild(defs);
+  const badge = (n, x, y, c) => {
+    if (n == null) return;
+    svg.insertAdjacentHTML("beforeend", `<circle cx="${x}" cy="${y}" r="12" fill="#111" stroke="${c}" stroke-width="2"/><text class="n" x="${x}" y="${y + 6}" text-anchor="middle" fill="${c}">${n}</text>`);
+  };
+  for (const w of wires) {
+    const [n, flow, a, as, af, b, bs, bf, kind] = w;
+    if (kind === "skip") continue;
+    const p = pt(a, as, af), q = pt(b, bs, bf), c = C[flow];
+    let d, mid;
+    if (kind === "elbow") {          // API up through the column gap to Bedrock
+      const gx = X(3) - 42, gy = Y(0) + H + 24;
+      d = `M${p[0]},${p[1]} H${gx} V${gy} H${q[0]} V${q[1]}`; mid = [(gx + q[0]) / 2, gy];
+    } else if (kind === "elbow2") {  // matcher back to DynamoDB, under the stream arrow
+      const gx = X(3) - 18, gy = Y(1) + H + 22;
+      d = `M${p[0]},${p[1]} H${gx} V${gy} H${q[0]} V${q[1]}`; mid = [(gx + q[0]) / 2, gy];
+    } else if (kind === "elbow3") {  // matcher to SQS
+      d = `M${p[0]},${p[1]} H${q[0]} V${q[1]}`; mid = null;
+    } else if (kind === "elbow4") {  // calendar app up to CloudFront, for the trip feed
+      d = `M${p[0]},${p[1]} V${Y(2) + H + 18} H${X(0) + W + 22} V${q[1]} H${q[0]}`; mid = null;
+    } else if (kind === "elbow5") {  // matcher down to your device: Web Push, through the browser's push service
+      const gy = Y(2) + H + 36;
+      d = `M${p[0]},${p[1]} V${gy} H${q[0]} V${q[1]}`; mid = [(p[0] + q[0]) / 2 + 60, gy];
+    } else {
+      d = `M${p[0]},${p[1]} L${q[0]},${q[1]}`; mid = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+    }
+    svg.insertAdjacentHTML("beforeend", `<path d="${d}" fill="none" stroke="${c}" stroke-width="2.5" marker-end="url(#a-${flow})"/>`);
+    if (mid) badge(n, mid[0], mid[1], c);
+  }
+  // 17: "I got it" from your browser to the clock's task token, drawn along the bottom
+  {
+    const p = pt("you", "b", .7), q = pt("clock", "b", .5), yb = Y(3) + H + 26;
+    svg.insertAdjacentHTML("beforeend", `<path d="M${p[0]},${p[1]} V${yb} H${q[0]} V${q[1]}" fill="none" stroke="${C.clock}" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#a-clock)"/>`);
+    badge(17, (p[0] + q[0]) / 2, yb, C.clock);
+  }
+  // 16 back-arrow: clock steps record into DynamoDB is described in the box text; keep the picture readable
+</script>
+</body>
+</html>

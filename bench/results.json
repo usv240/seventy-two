@@ -1,0 +1,544 @@
+{
+ "summary": {
+  "positives": 14,
+  "labelled_windows": 39,
+  "labelled_windows_found_exactly": 37,
+  "held_out_notices": 3,
+  "held_out_windows": 5,
+  "held_out_found_exactly": 3,
+  "negatives": 13,
+  "windows_created_from_negatives": 0,
+  "hard_negatives": 4,
+  "windows_created_from_hard_negatives": 0,
+  "extra_windows_on_positives": 0,
+  "rejected_by_validator": 0,
+  "regex_windows_from_negatives": 9,
+  "claude_alone": {
+   "labelled_windows_found_exactly": 37,
+   "windows_not_exactly_a_labelled_one": 1,
+   "held_out_found_exactly": 3,
+   "windows_from_negatives": 0,
+   "watch_until_dates_not_written_in_the_notice": 17
+  },
+  "with_checks_windows_not_exactly_a_labelled_one": 1,
+  "regex_vs_truth_positives": [
+   [
+    2,
+    1
+   ],
+   [
+    1,
+    1
+   ],
+   [
+    1,
+    1
+   ],
+   [
+    3,
+    3
+   ],
+   [
+    0,
+    1
+   ],
+   [
+    0,
+    7
+   ],
+   [
+    0,
+    3
+   ],
+   [
+    12,
+    2
+   ],
+   [
+    0,
+    1
+   ],
+   [
+    9,
+    6
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    2,
+    1
+   ],
+   [
+    1,
+    1
+   ],
+   [
+    2,
+    3
+   ]
+  ],
+  "skipped_unfetchable": [
+   {
+    "url": "https://www.cdc.gov/measles/about/index.html",
+    "error": "HTTP Error 403: Forbidden"
+   },
+   {
+    "url": "https://www.cdc.gov/measles/vaccines/index.html",
+    "error": "HTTP Error 403: Forbidden"
+   },
+   {
+    "url": "https://www.cdc.gov/measles/signs-symptoms/index.html",
+    "error": "HTTP Error 403: Forbidden"
+   },
+   {
+    "url": "https://www.cdc.gov/measles/hcp/vaccine-considerations/index.html",
+    "error": "HTTP Error 403: Forbidden"
+   },
+   {
+    "url": "https://www.usnews.com/news/us/articles/2026-11-13/us-measles-cases-rise-to-5-412-cdc-says",
+    "error": "The read operation timed out"
+   },
+   {
+    "url": "https://www.mayoclinic.org/diseases-conditions/measles/symptoms-causes/syc-20374857",
+    "error": "HTTP Error 403: Forbidden"
+   }
+  ],
+  "mutations_caught": {
+   "wrong date (9 days later)": "38 of 38",
+   "invented place": "38 of 38",
+   "invented quote": "38 of 38",
+   "wrong start time (3 hours later)": "28 of 34",
+   "start time of another window in the same notice": "27 of 27",
+   "date of another window in the same notice": "25 of 28"
+  },
+  "cost_usd_total": 0.1862,
+  "model": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+ },
+ "rows": [
+  {
+   "url": "https://www.phila.gov/2026-09-19-health-department-warns-of-possible-measles-exposure-at-philadelphia-international-airport/",
+   "kind": "positive",
+   "expected_windows": 1,
+   "found_windows": 1,
+   "rejected": 0,
+   "regex_windows": 2,
+   "seconds": 2.6,
+   "cost_usd": 0.0053,
+   "alone_windows": 1,
+   "alone_watch_until_not_written": 1,
+   "expected_found": 1,
+   "expected_total": 1,
+   "extra_windows": 0,
+   "alone_found": 1,
+   "alone_wrong": 0,
+   "checked_wrong": 0
+  },
+  {
+   "url": "https://www.phila.gov/2026-07-11-health-department-warns-of-possible-measles-exposure-at-the-philadelphia-international-airport-4/",
+   "kind": "positive",
+   "expected_windows": 1,
+   "found_windows": 1,
+   "rejected": 0,
+   "regex_windows": 1,
+   "seconds": 1.8,
+   "cost_usd": 0.00524,
+   "alone_windows": 1,
+   "alone_watch_until_not_written": 1,
+   "expected_found": 1,
+   "expected_total": 1,
+   "extra_windows": 0,
+   "alone_found": 1,
+   "alone_wrong": 0,
+   "checked_wrong": 0
+  },
+  {
+   "url": "https://www.phila.gov/2026-02-15-health-department-warns-of-possible-measles-exposure-at-the-philadelphia-international-airport-3/",
+   "kind": "positive",
+   "expected_windows": 1,
+   "found_windows": 1,
+   "rejected": 0,
+   "regex_windows": 1,
+   "seconds": 1.5,
+   "cost_usd": 0.00483,
+   "alone_windows": 1,
+   "alone_watch_until_not_written": 1,
+   "expected_found": 1,
+   "expected_total": 1,
+   "extra_windows": 0,
+   "alone_found": 1,
+   "alone_wrong": 0,
+   "checked_wrong": 0
+  },
+  {
+   "url": "https://www.phila.gov/2026-01-12-health-department-warns-of-possible-measles-exposures-at-the-philadelphia-international-airport-and-william-h-gray-iii-30th-street-station/",
+   "kind": "positive",
+   "expected_windows": 3,
+   "found_windows": 3,
+   "rejected": 0,
+   "regex_windows": 3,
+   "seconds": 2.9,
+   "cost_usd": 0.00677,
+   "alone_windows": 3,
+   "alone_watch_until_not_written": 3,
+   "expected_found": 3,
+   "expected_total": 3,
+   "extra_windows": 0,
+   "alone_found": 3,
+   "alone_wrong": 0,
+   "checked_wrong": 0
+  },
+  {
+   "url": "https://www.dhs.wisconsin.gov/news/releases/110626.htm",
+   "kind": "positive",
+   "expected_windows": 1,
+   "found_windows": 1,
+   "rejected": 0,
+   "regex_windows": 0,
+   "seconds": 1.6,
+   "cost_usd": 0.00449,
+   "alone_windows": 1,
+   "alone_watch_until_not_written": 0,
+   "expected_found": 1,
+   "expected_total": 1,
+   "extra_windows": 0,
+   "alone_found": 1,
+   "alone_wrong": 0,
+   "checked_wrong": 0
+  },
+  {
+   "url": "https://www.polkcountyiowa.gov/health-department/news-and-press-releases/measles-case-confirmed-in-polk-county-nov-11-2026/",
+   "kind": "positive",
+   "expected_windows": 7,
+   "found_windows": 7,
+   "rejected": 0,
+   "regex_windows": 0,
+   "seconds": 4.9,
+   "cost_usd": 0.0113,
+   "alone_windows": 7,
+   "alone_watch_until_not_written": 0,
+   "expected_found": 7,
+   "expected_total": 7,
+   "extra_windows": 0,
+   "alone_found": 7,
+   "alone_wrong": 0,
+   "checked_wrong": 0
+  },
+  {
+   "url": "https://www.sandiegocounty.gov/content/sdc/hhsa/programs/phs/community_epidemiology/dc/Measles/Measles2026.html",
+   "kind": "positive",
+   "expected_windows": 3,
+   "found_windows": 3,
+   "rejected": 0,
+   "regex_windows": 0,
+   "seconds": 2.9,
+   "cost_usd": 0.0079,
+   "alone_windows": 3,
+   "alone_watch_until_not_written": 0,
+   "expected_found": 3,
+   "expected_total": 3,
+   "extra_windows": 0,
+   "alone_found": 3,
+   "alone_wrong": 0,
+   "checked_wrong": 0
+  },
+  {
+   "url": "https://chautauquacountyny.gov/public-health/news/chautauqua-county-health-department-alerts-community-potential-measles-exposures",
+   "kind": "positive",
+   "expected_windows": 2,
+   "found_windows": 2,
+   "rejected": 0,
+   "regex_windows": 12,
+   "seconds": 2.4,
+   "cost_usd": 0.00728,
+   "alone_windows": 2,
+   "alone_watch_until_not_written": 2,
+   "expected_found": 2,
+   "expected_total": 2,
+   "extra_windows": 0,
+   "alone_found": 2,
+   "alone_wrong": 0,
+   "checked_wrong": 0,
+   "hard": true
+  },
+  {
+   "url": "https://wausaupilotandreview.com/2026/11/06/measles-exposure-reported-at-weston-emergency-department-free-vaccine-clinic-set-for-sunday/",
+   "kind": "positive",
+   "expected_windows": 1,
+   "found_windows": 1,
+   "rejected": 0,
+   "regex_windows": 0,
+   "seconds": 2.0,
+   "cost_usd": 0.0056,
+   "alone_windows": 1,
+   "alone_watch_until_not_written": 1,
+   "expected_found": 1,
+   "expected_total": 1,
+   "extra_windows": 0,
+   "alone_found": 1,
+   "alone_wrong": 0,
+   "checked_wrong": 0,
+   "hard": true
+  },
+  {
+   "url": "https://www.nj.gov/health/news/2026/approved/20261113a.shtml",
+   "kind": "positive",
+   "expected_windows": 6,
+   "found_windows": 6,
+   "rejected": 0,
+   "regex_windows": 9,
+   "seconds": 4.2,
+   "cost_usd": 0.00972,
+   "alone_windows": 6,
+   "alone_watch_until_not_written": 6,
+   "expected_found": 6,
+   "expected_total": 6,
+   "extra_windows": 0,
+   "alone_found": 6,
+   "alone_wrong": 0,
+   "checked_wrong": 0,
+   "hard": true,
+   "added_after_checks": true
+  },
+  {
+   "url": "https://www.wsmv.com/2026/11/05/health-department-warns-potential-measles-exposure-several-middle-tennessee-locations-heres-what-know/",
+   "kind": "positive",
+   "expected_windows": 8,
+   "found_windows": 8,
+   "rejected": 0,
+   "regex_windows": 7,
+   "seconds": 5.4,
+   "cost_usd": 0.01138,
+   "alone_windows": 8,
+   "alone_watch_until_not_written": 0,
+   "expected_found": 8,
+   "expected_total": 8,
+   "extra_windows": 0,
+   "alone_found": 8,
+   "alone_wrong": 0,
+   "checked_wrong": 0,
+   "hard": true,
+   "added_after_checks": true
+  },
+  {
+   "url": "https://dph.sc.gov/news/friday-measles-update-dph-reports-6-new-measles-cases-upstate-bringing-outbreak-total-985",
+   "kind": "positive",
+   "expected_windows": 1,
+   "found_windows": 1,
+   "rejected": 0,
+   "regex_windows": 2,
+   "seconds": 1.8,
+   "cost_usd": 0.00475,
+   "alone_windows": 1,
+   "alone_watch_until_not_written": 1,
+   "expected_found": 1,
+   "expected_total": 1,
+   "extra_windows": 0,
+   "alone_found": 1,
+   "alone_wrong": 0,
+   "checked_wrong": 0,
+   "hard": true,
+   "held_out": true
+  },
+  {
+   "url": "https://dph.sc.gov/news/tuesday-measles-update-dph-reports-5-new-measles-cases-bringing-outbreak-total-990-additional",
+   "kind": "positive",
+   "expected_windows": 1,
+   "found_windows": 1,
+   "rejected": 0,
+   "regex_windows": 1,
+   "seconds": 1.9,
+   "cost_usd": 0.00457,
+   "alone_windows": 1,
+   "alone_watch_until_not_written": 1,
+   "expected_found": 1,
+   "expected_total": 1,
+   "extra_windows": 0,
+   "alone_found": 1,
+   "alone_wrong": 0,
+   "checked_wrong": 0,
+   "held_out": true
+  },
+  {
+   "url": "https://kutv.com/news/local/health-officials-flag-two-salt-lake-county-locations-for-measles-exposure-as-cases-rise",
+   "kind": "positive",
+   "expected_windows": 3,
+   "found_windows": 2,
+   "rejected": 0,
+   "regex_windows": 2,
+   "seconds": 2.1,
+   "cost_usd": 0.00516,
+   "alone_windows": 2,
+   "alone_watch_until_not_written": 0,
+   "expected_found": 1,
+   "expected_total": 3,
+   "extra_windows": 0,
+   "alone_found": 1,
+   "alone_wrong": 1,
+   "checked_wrong": 1,
+   "hard": true,
+   "held_out": true
+  },
+  {
+   "url": "https://www.aljazeera.com/news/2026/11/7/cdc-reports-more-than-5000-measles-cases-highest-number-in-35-years",
+   "kind": "negative",
+   "expected_windows": 0,
+   "found_windows": 0,
+   "rejected": 0,
+   "regex_windows": 0,
+   "seconds": 0.7,
+   "cost_usd": 0.00312,
+   "alone_windows": 0,
+   "alone_watch_until_not_written": 0
+  },
+  {
+   "url": "https://www.cnbc.com/2026/11/11/measles-outbreak-us-economic-cost.html",
+   "kind": "negative",
+   "expected_windows": 0,
+   "found_windows": 0,
+   "rejected": 0,
+   "regex_windows": 2,
+   "seconds": 0.7,
+   "cost_usd": 0.00494,
+   "alone_windows": 0,
+   "alone_watch_until_not_written": 0
+  },
+  {
+   "url": "https://stateline.org/2026/11/13/us-poised-to-lose-its-measles-elimination-status-after-more-than-25-years/",
+   "kind": "negative",
+   "expected_windows": 0,
+   "found_windows": 0,
+   "rejected": 0,
+   "regex_windows": 1,
+   "seconds": 0.7,
+   "cost_usd": 0.00553,
+   "alone_windows": 0,
+   "alone_watch_until_not_written": 0
+  },
+  {
+   "url": "https://www.cidrap.umn.edu/measles/south-carolina-s-measles-outbreak-hits-700-cases-cdc-confirms-416-so-far-2026",
+   "kind": "negative",
+   "expected_windows": 0,
+   "found_windows": 0,
+   "rejected": 0,
+   "regex_windows": 0,
+   "seconds": 0.6,
+   "cost_usd": 0.00469,
+   "alone_windows": 0,
+   "alone_watch_until_not_written": 0
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Measles",
+   "kind": "negative",
+   "expected_windows": 0,
+   "found_windows": 0,
+   "rejected": 0,
+   "regex_windows": 0,
+   "seconds": 1.0,
+   "cost_usd": 0.02125,
+   "alone_windows": 0,
+   "alone_watch_until_not_written": 0
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Measles_resurgence_in_the_United_States",
+   "kind": "negative",
+   "expected_windows": 0,
+   "found_windows": 0,
+   "rejected": 0,
+   "regex_windows": 0,
+   "seconds": 0.8,
+   "cost_usd": 0.01656,
+   "alone_windows": 0,
+   "alone_watch_until_not_written": 0
+  },
+  {
+   "url": "https://www.who.int/news-room/fact-sheets/detail/measles",
+   "kind": "negative",
+   "expected_windows": 0,
+   "found_windows": 0,
+   "rejected": 0,
+   "regex_windows": 0,
+   "seconds": 0.6,
+   "cost_usd": 0.00513,
+   "alone_windows": 0,
+   "alone_watch_until_not_written": 0
+  },
+  {
+   "url": "https://www.nfid.org/infectious-disease/measles/",
+   "kind": "negative",
+   "expected_windows": 0,
+   "found_windows": 0,
+   "rejected": 0,
+   "regex_windows": 3,
+   "seconds": 0.6,
+   "cost_usd": 0.00422,
+   "alone_windows": 0,
+   "alone_watch_until_not_written": 0
+  },
+  {
+   "url": "https://www.chop.edu/vaccine-education-center/vaccine-details/measles-mumps-and-rubella-vaccines",
+   "kind": "negative",
+   "expected_windows": 0,
+   "found_windows": 0,
+   "rejected": 0,
+   "regex_windows": 0,
+   "seconds": 0.8,
+   "cost_usd": 0.0148,
+   "alone_windows": 0,
+   "alone_watch_until_not_written": 0
+  },
+  {
+   "url": "https://health.utahcounty.gov/2026/04/14/drive-up-immunization-clinic-for-mmr/",
+   "kind": "negative",
+   "expected_windows": 0,
+   "found_windows": 0,
+   "rejected": 0,
+   "regex_windows": 1,
+   "seconds": 0.7,
+   "cost_usd": 0.00247,
+   "alone_windows": 0,
+   "alone_watch_until_not_written": 0,
+   "hard": true
+  },
+  {
+   "url": "https://www.kttc.com/2026/09/20/fillmore-county-offers-measles-vaccinations-after-confirmed-case/",
+   "kind": "negative",
+   "expected_windows": 0,
+   "found_windows": 0,
+   "rejected": 0,
+   "regex_windows": 2,
+   "seconds": 0.6,
+   "cost_usd": 0.00287,
+   "alone_windows": 0,
+   "alone_watch_until_not_written": 0,
+   "hard": true
+  },
+  {
+   "url": "https://kanecountyconnects.com/article/KaneCountyHealthDept-Measles-Vaccination",
+   "kind": "negative",
+   "expected_windows": 0,
+   "found_windows": 0,
+   "rejected": 0,
+   "regex_windows": 0,
+   "seconds": 0.8,
+   "cost_usd": 0.00319,
+   "alone_windows": 0,
+   "alone_watch_until_not_written": 0,
+   "hard": true
+  },
+  {
+   "url": "https://news.mecknc.gov/public-health-offering-same-day-vaccines-after-measles-detected-mecklenburg-county-wastewater",
+   "kind": "negative",
+   "expected_windows": 0,
+   "found_windows": 0,
+   "rejected": 0,
+   "regex_windows": 0,
+   "seconds": 0.7,
+   "cost_usd": 0.00314,
+   "alone_windows": 0,
+   "alone_watch_until_not_written": 0,
+   "hard": true
+  }
+ ]
+}

@@ -1,0 +1,196 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Deadline clock: the pattern under Seventy-Two, on its own. One Step Functions execution per person runs their
+  deadlines side by side. Before each deadline it reminds them; then it waits on a task token whose timeout is
+  the deadline itself. "I acted" resumes it, from your app or from the one-click link in each reminder; silence
+  closes the window on its own. Waiting costs nothing. Deploy with `sam deploy --guided`, or with CloudFormation
+  alone: there is nothing to build.
+
+Resources:
+  Steps:   # the deadlines and who has acted, plus the task token each waiting step is paused on
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{AttributeName: clock_id, AttributeType: S}, {AttributeName: name, AttributeType: S}]
+      KeySchema: [{AttributeName: clock_id, KeyType: HASH}, {AttributeName: name, KeyType: RANGE}]
+      TimeToLiveSpecification: {AttributeName: ttl, Enabled: true}
+
+  Events:   # subscribe your app, an email address or a queue: reminder, acted, missed
+    Type: AWS::SNS::Topic
+
+  ClockStep:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.12
+      Architectures: [arm64]
+      Handler: index.handler
+      Timeout: 10
+      Environment: {Variables: {TABLE: !Ref Steps, TOPIC: !Ref Events}}
+      FunctionUrlConfig: {AuthType: NONE}   # the one-click "I acted" link; each link carries its own random key
+      Policies:
+        - DynamoDBCrudPolicy: {TableName: !Ref Steps}
+        - SNSPublishMessagePolicy: {TopicName: !GetAtt Events.TopicName}
+        - Statement:
+            - Effect: Allow
+              Action: [states:SendTaskSuccess]
+              Resource: !Sub "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${AWS::StackName}-clock"
+      InlineCode: |
+        import base64, hmac, html, json, math, os, secrets, time
+        from datetime import datetime, timezone
+        from urllib.parse import parse_qs, urlencode
+        import boto3
+
+        table = boto3.resource("dynamodb").Table(os.environ["TABLE"])
+        sns, sfn = boto3.client("sns"), boto3.client("stepfunctions")
+
+        def seconds_left(at):
+            """Whole seconds until the deadline, rounded up so a window never closes early."""
+            t = datetime.fromisoformat(at.replace("Z", "+00:00"))
+            return max(1, math.ceil((t - datetime.now(timezone.utc)).total_seconds()))
+
+        def tell(clock_id, name, event, **more):
+            sns.publish(TopicArn=os.environ["TOPIC"], Message=json.dumps({"clock_id": clock_id, "deadline": name, "event": event, **more}))
+
+        def resume(token):
+            """True if the workflow took it in time. Step Functions decides: a token succeeds or times out, never both."""
+            try:
+                sfn.send_task_success(taskToken=token, output="{}")
+                return True
+            except (sfn.exceptions.TaskTimedOut, sfn.exceptions.TaskDoesNotExist):
+                return False   # the deadline passed first: the window is already closed
+
+        def mark_done(key, ttl):
+            """Record that they acted, and say whether it was in time, the same way the workflow will end."""
+            item = table.update_item(Key=key, UpdateExpression="SET #d = :y, #ttl = :ttl", ReturnValues="ALL_NEW",
+                                     ExpressionAttributeNames={"#d": "done", "#ttl": "ttl"},
+                                     ExpressionAttributeValues={":y": True, ":ttl": ttl})["Attributes"]
+            if item.get("token"):
+                return resume(item["token"])
+            # not waiting yet: before the reminder it is in time; the wait step will resume at once
+            due = item.get("deadline_at")
+            return not due or datetime.now(timezone.utc) < datetime.fromisoformat(due.replace("Z", "+00:00"))
+
+        def page(status, title, text, form=""):
+            body = ('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+                    f'<title>{html.escape(title)}</title><body style="font:18px/1.5 system-ui,sans-serif;max-width:32rem;margin:3rem auto;padding:0 1rem">'
+                    f'<h1 style="font-size:1.5rem">{html.escape(title)}</h1><p>{html.escape(text)}</p>{form}</body>')
+            return {"statusCode": status, "headers": {"content-type": "text/html; charset=utf-8", "cache-control": "no-store"}, "body": body}
+
+        def link(e, ttl):
+            """The one-click link. Opening it only shows a button, so a mail scanner that opens links records nothing."""
+            method = e["requestContext"]["http"]["method"]
+            q = {k: v[0] for k, v in parse_qs(e.get("rawQueryString") or "").items()}
+            if method == "POST":
+                raw = e.get("body") or ""
+                q.update({k: v[0] for k, v in parse_qs(base64.b64decode(raw).decode() if e.get("isBase64Encoded") else raw).items()})
+            key = {"clock_id": q.get("c", ""), "name": q.get("n", "")}
+            item = table.get_item(Key=key, ConsistentRead=True).get("Item") if key["clock_id"] and key["name"] else None
+            if not item or not item.get("key") or not hmac.compare_digest(item["key"], q.get("k", "")):
+                return page(404, "Link not found", "This link is not valid, or it has expired.")
+            if item.get("done"):
+                return page(200, "Already recorded", f"You already said you did this: {key['name']}.")
+            if method != "POST":
+                button = '<form method="post"><button style="font:inherit;padding:.6rem 1.2rem">Yes, I did it</button></form>'
+                return page(200, f"Did you do this? {key['name']}", "Press the button to record it. Your reminders for it stop.", button)
+            if not mark_done(key, ttl):
+                return page(200, "Too late", f"Recorded, but the deadline for this had already passed: {key['name']}.")
+            return page(200, "Recorded", f"Thank you. {key['name']}: done.")
+
+        def handler(e, _ctx):
+            ttl = int(time.time()) + 90 * 86400
+            if "requestContext" in e:   # a person pressed the link in a reminder
+                return link(e, ttl)
+            key = {"clock_id": e["clock_id"], "name": e["name"]}
+            if e["action"] == "remind":   # a day (or whatever you choose) before the deadline
+                if (table.get_item(Key=key, ConsistentRead=True).get("Item") or {}).get("done"):
+                    return {"done": True, "wait_s": 1}   # they already acted: no reminder
+                k = table.update_item(Key=key, UpdateExpression="SET #k = if_not_exists(#k, :k), #da = :da, #ttl = :ttl", ReturnValues="ALL_NEW",
+                                      ExpressionAttributeNames={"#k": "key", "#da": "deadline_at", "#ttl": "ttl"},
+                                      ExpressionAttributeValues={":k": secrets.token_urlsafe(24), ":da": e["deadline_at"], ":ttl": ttl})["Attributes"]["key"]
+                act = f'{e["link"]}?{urlencode({"c": e["clock_id"], "n": e["name"], "k": k})}' if e.get("link") else None
+                tell(e["clock_id"], e["name"], "reminder", deadline_at=e["deadline_at"], act_url=act)
+                return {"done": False, "wait_s": seconds_left(e["deadline_at"])}   # measured now, so a slow reminder cannot move the deadline
+            if e["action"] == "wait":   # the workflow pauses here; keep the token so "I acted" can resume it
+                item = table.update_item(Key=key, UpdateExpression="SET #t = :t, #ttl = :ttl", ReturnValues="ALL_NEW",
+                                         ExpressionAttributeNames={"#t": "token", "#ttl": "ttl"},
+                                         ExpressionAttributeValues={":t": e["token"], ":ttl": ttl})["Attributes"]
+                if item.get("done"):   # "I acted" arrived between the reminder and this step
+                    resume(e["token"])
+                return {}
+            if e["action"] == "done":   # your app calls this when the person acts; "in_time" says how the deadline ends
+                return {"ok": True, "in_time": mark_done(key, ttl)}
+            tell(e["clock_id"], e["name"], e["action"])   # "acted" or "missed"
+            return {}
+
+  LinkCanInvoke:   # function URLs made since October 2025 need lambda:InvokeFunction too, limited here to calls through the URL
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ClockStep
+      Principal: "*"
+      InvokedViaFunctionUrl: true
+
+  Clock:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: !Sub "${AWS::StackName}-clock"
+      Type: STANDARD
+      Policies: [{LambdaInvokePolicy: {FunctionName: !Ref ClockStep}}]
+      DefinitionSubstitutions: {Fn: !GetAtt ClockStep.Arn, Link: !GetAtt ClockStepUrl.FunctionUrl}
+      Definition:
+        Comment: "Input: {clock_id, deadlines: [{name, remind_at, deadline_at}]}, times in ISO 8601 UTC."
+        StartAt: EveryDeadline
+        States:
+          EveryDeadline:
+            Type: Map
+            ItemsPath: $.deadlines
+            ItemSelector: {"clock_id.$": $.clock_id, "d.$": $$.Map.Item.Value}
+            MaxConcurrency: 0
+            End: true
+            ItemProcessor:
+              ProcessorConfig: {Mode: INLINE}
+              StartAt: WaitUntilReminder
+              States:
+                WaitUntilReminder: {Type: Wait, TimestampPath: $.d.remind_at, Next: Remind}
+                Remind:
+                  Type: Task
+                  Resource: arn:aws:states:::lambda:invoke
+                  Parameters: {FunctionName: "${Fn}", Payload: {action: remind, "clock_id.$": $.clock_id, "name.$": $.d.name, "deadline_at.$": $.d.deadline_at, link: "${Link}"}}
+                  ResultSelector: {"done.$": $.Payload.done, "wait_s.$": $.Payload.wait_s}
+                  ResultPath: $.r
+                  Retry: [{ErrorEquals: [States.ALL], IntervalSeconds: 2, MaxAttempts: 3, BackoffRate: 2}]
+                  Next: AlreadyDone
+                AlreadyDone:
+                  Type: Choice
+                  Choices: [{Variable: $.r.done, BooleanEquals: true, Next: Acted}]
+                  Default: WaitForThePerson
+                WaitForThePerson:   # the deadline is the timeout
+                  Type: Task
+                  Resource: arn:aws:states:::lambda:invoke.waitForTaskToken
+                  Parameters: {FunctionName: "${Fn}", Payload: {action: wait, "clock_id.$": $.clock_id, "name.$": $.d.name, "token.$": $$.Task.Token}}
+                  TimeoutSecondsPath: $.r.wait_s
+                  ResultPath: null
+                  Retry: [{ErrorEquals: [Lambda.ServiceException, Lambda.TooManyRequestsException], IntervalSeconds: 2, MaxAttempts: 3}]
+                  Catch: [{ErrorEquals: [States.Timeout], ResultPath: null, Next: Missed}]
+                  Next: Acted
+                Acted:
+                  Type: Task
+                  Resource: arn:aws:states:::lambda:invoke
+                  Parameters: {FunctionName: "${Fn}", Payload: {action: acted, "clock_id.$": $.clock_id, "name.$": $.d.name}}
+                  ResultPath: null
+                  Retry: [{ErrorEquals: [States.ALL], IntervalSeconds: 2, MaxAttempts: 3, BackoffRate: 2}]
+                  End: true
+                Missed:
+                  Type: Task
+                  Resource: arn:aws:states:::lambda:invoke
+                  Parameters: {FunctionName: "${Fn}", Payload: {action: missed, "clock_id.$": $.clock_id, "name.$": $.d.name}}
+                  ResultPath: null
+                  Retry: [{ErrorEquals: [States.ALL], IntervalSeconds: 2, MaxAttempts: 3, BackoffRate: 2}]
+                  End: true
+
+Outputs:
+  ClockStateMachineArn: {Value: !Ref Clock}
+  ClockStepFunction: {Value: !Ref ClockStep}
+  EventsTopicArn: {Value: !Ref Events}
+  LinkUrl: {Value: !GetAtt ClockStepUrl.FunctionUrl, Description: "Where the one-click links point; each reminder carries a link with its own key"}

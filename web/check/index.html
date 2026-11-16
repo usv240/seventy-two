@@ -1,0 +1,48 @@
+<!-- page {"title": "Check where you were | Seventy-Two", "description": "Describe where you were in your own words. Seventy-Two checks it against measles exposure notices and shows what is still open, until when, and who to call.", "nav": "check", "scripts": ["/assets/check.js"]} -->
+<main id="main">
+  <section class="app-top">
+    <div class="wrap split">
+      <div class="span-7">
+        <h1 class="page-title">Where were you?</h1>
+        <p class="lead">Describe it the way you would tell a friend. Add every place you were in the last three weeks.</p>
+      </div>
+      <div class="span-5 side-note">
+        <p>Seventy-Two checks your places and times against every exposure window in the health department notices it reads. <span data-info-for="match"></span></p>
+        <p class="small">Not medical advice. If you feel sick, call your doctor before you go in.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="app-body">
+    <div class="wrap split">
+      <form class="span-7" id="check-form" autocomplete="off" novalidate>
+        <div class="field">
+          <label for="q">Your places and times</label>
+          <textarea id="q" name="q" required placeholder="Flew out of PHL on Sunday Sept 13, Terminal B, about 8 to 11:30 pm. Walmart in Ankeny on Nov 5 around 6 pm." aria-describedby="q-hint"></textarea>
+          <p class="hint" id="q-hint">Airport codes work (PHL, DEN, LAX). Times help: without them we treat the whole day as a match.</p>
+        </div>
+        <div class="field replay">
+          <label class="switch"><input type="checkbox" id="replay-on"> <span>Replay a past date instead of today <span data-info-for="replay"></span></span></label>
+          <div id="replay-fields" hidden>
+            <label for="replay-date">Check as if today were</label>
+            <input type="date" id="replay-date" min="2025-12-01">
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" type="submit" id="check-btn">Check</button>
+          <button class="link-btn" type="button" id="use-real">Try a real 2026 exposure</button>
+        </div>
+        <p class="error" id="check-error" role="alert" hidden></p>
+      </form>
+      <aside class="span-5 understood" id="understood" aria-live="polite" hidden>
+        <h2 class="mini-h">What we understood</h2>
+        <ul id="stops" class="stop-list"></ul>
+        <p class="small">If something is wrong, edit your text and check again.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="results" id="results" aria-live="polite" hidden>
+    <div class="wrap" id="results-inner"></div>
+  </section>
+</main>

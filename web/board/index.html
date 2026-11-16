@@ -1,0 +1,54 @@
+<!-- page {"title": "The board: every measles exposure window | Seventy-Two", "description": "Every measles exposure window Seventy-Two is watching, read from US health department notices, with each source's live status.", "nav": "board", "scripts": ["/assets/board.js"]} -->
+<main id="main">
+  <section class="app-top">
+    <div class="wrap split">
+      <div class="span-7">
+        <h1 class="page-title">The board</h1>
+        <p class="lead">Every measles exposure window we are watching, newest first. Open a row to see the notice's own words.</p>
+      </div>
+      <div class="span-5 side-note">
+        <p>Read from <span class="num" id="n-sources">27</span> health department pages every 30 minutes, plus every new measles notice their news pages link to. <span data-info-for="sources"></span></p>
+        <p class="small" id="as-of"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="app-body">
+    <div class="wrap">
+      <form class="filters" id="filters" role="search" onsubmit="return false">
+        <div class="field"><label for="f-q">Search a place</label><input type="text" id="f-q" placeholder="Airport, store, hospital, city"></div>
+        <div class="field"><label for="f-state">State</label><select id="f-state"><option value="">All states</option></select></div>
+        <div class="field"><label class="switch"><input type="checkbox" id="f-all"> <span>Include exposures more than 21 days old</span></label></div>
+      </form>
+      <div class="board">
+        <table>
+          <caption id="board-caption">Loading.</caption>
+          <thead><tr><th scope="col" style="width:40%">Place</th><th scope="col" class="state-col" style="width:7%">State</th><th scope="col" style="width:28%">When</th><th scope="col" style="width:25%">Status</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <dl class="board-key" aria-label="What each status means">
+        <div><dt><span class="key-tile status-open">Vaccine window open</span></dt><dd>The MMR vaccine can still prevent measles. Open for 72 hours after the exposure.</dd></div>
+        <div><dt><span class="key-tile status-watch">Immune globulin open</span></dt><dd>An antibody shot for babies, pregnant people and people with weak immune systems. Open for 6 days.</dd></div>
+        <div><dt><span class="key-tile status-watch">Watch for symptoms</span></dt><dd>Both windows have closed. Watch for fever and rash for 21 days, and call before you go in.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="field-band" id="status" aria-labelledby="status-h">
+    <div class="wrap split">
+      <div class="span-4">
+        <h2 id="status-h" class="mini-head">Live status</h2>
+        <p>Every source we read, when we last read it, and whether it worked. Nothing is hidden. <span data-info-for="scheduler"></span></p>
+        <dl class="figures" id="figures"></dl>
+        <ul class="alarm-list" id="alarms" aria-label="CloudWatch alarms" hidden></ul>
+      </div>
+      <div class="span-8 board">
+        <table>
+          <thead><tr><th scope="col" style="width:52%">Source</th><th scope="col" class="n">Windows</th><th scope="col">Last read</th></tr></thead>
+          <tbody id="sources"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>

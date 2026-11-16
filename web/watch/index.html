@@ -1,0 +1,42 @@
+<!-- page {"title": "Your trip, watched | Seventy-Two", "description": "Your saved trip, checked against every new measles exposure notice the moment it is read, for 21 days after your last stop.", "nav": "check", "scripts": ["/assets/watch.js"]} -->
+<main id="main">
+  <div class="demo-banner" id="drill-banner" hidden>Drill: this trip and its match are a test written by scripts/drill.py, to show the matcher working. Nobody was exposed.</div>
+  <section class="app-top">
+    <div class="wrap split">
+      <div class="span-7">
+        <h1 class="page-title">Your trip, watched</h1>
+        <p class="lead" id="watch-lead">Loading your trip.</p>
+      </div>
+      <div class="span-5 side-note">
+        <p>When a health department posts a new notice, Seventy-Two reads it within about 30 minutes. The moment it stores a new exposure window, it checks that window against your trip. You do not have to come back and check. <span data-info-for="trip-watch"></span></p>
+        <p class="small">No account. This page's address is the only key to your trip. It deletes itself 21 days after your last stop.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="app-body">
+    <div class="wrap">
+      <div class="board" data-ui>
+        <table>
+          <caption id="watch-caption">Each place is checked against every new exposure window, the moment it is stored.</caption>
+          <thead><tr><th scope="col" style="width:46%">Place</th><th scope="col" style="width:30%">When</th><th scope="col" style="width:24%">Status</th></tr></thead>
+          <tbody id="stops"></tbody>
+        </table>
+      </div>
+      <p class="small" id="matcher-line"></p>
+      <div class="actions" id="watch-actions" hidden>
+        <button class="btn" type="button" id="alerts">Alert me on this device</button>
+        <a class="btn secondary" id="subscribe" href="#">Subscribe in my calendar</a>
+        <button class="btn secondary" type="button" id="copy-feed">Copy the calendar address</button>
+        <button class="btn secondary" type="button" id="stop-watch">Stop watching and delete</button>
+      </div>
+      <p class="hint" id="alerts-note" role="status" hidden></p>
+      <p class="hint" id="feed-hint" hidden>An alert on this device arrives seconds after a matching notice is read. <span data-info-for="web-push"></span> Your calendar app also fetches the feed on its own, every few hours, and adds the match with what to do. <span data-info-for="calendar-feed"></span></p>
+      <p class="error" id="watch-error" role="alert" hidden></p>
+    </div>
+  </section>
+
+  <section class="results" id="matches" aria-live="polite" hidden>
+    <div class="wrap" id="matches-inner"></div>
+  </section>
+</main>

@@ -1,0 +1,198 @@
+<!-- page {"title": "Seventy-Two: were you where measles was?", "description": "Seventy-Two reads measles exposure notices from US health departments every 30 minutes, checks whether you were there, and starts your clock for the vaccine, immune globulin and the symptom watch.", "nav": "home", "scripts": ["/assets/home.js"]} -->
+<main id="main">
+
+  <!-- 1. Hero: the board, the question, the live check -->
+  <section class="hero" aria-labelledby="title">
+    <div class="wrap">
+      <h1 id="title" class="hero-title">Seventy-Two<span class="visually-hidden">: a measles exposure check</span></h1>
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="lead hero-lead">Were you where measles was?</p>
+          <p class="hero-sub">After a measles exposure, you have 72 hours to get the MMR vaccine, which can prevent the disease. <span style="white-space:nowrap">Seventy-Two</span> reads measles exposure notices from <span class="num" data-stat="issuers">US</span> health departments every 30 minutes. Tell it where you were, and it tells you in seconds whether that matches a notice, and what to do before time runs out.</p>
+        </div>
+
+        <form class="hero-check" id="hero-check" action="/check/" method="get" autocomplete="off">
+          <label for="trip">Where were you, and when?</label>
+          <div class="check-row">
+            <input type="text" id="trip" name="q" required placeholder="PHL airport, Sunday Sept 13, 8 to 11 pm" aria-describedby="trip-hint">
+            <button class="btn" type="submit">Check</button>
+          </div>
+          <p class="hint" id="trip-hint">Free. No account. Write it the way you would say it. <button type="button" class="link-btn" id="try-real">Try a real 2026 exposure</button>.</p>
+        </form>
+      </div>
+
+      <div class="board hero-board" data-ui aria-live="polite">
+        <table>
+          <caption>Latest exposure windows from health department notices. <a href="/board/" style="color:inherit">See every window</a>.</caption>
+          <thead><tr><th scope="col" style="width:41%">Place</th><th scope="col" class="state-col" style="width:7%">State</th><th scope="col" style="width:24%">When</th><th scope="col" style="width:28%">Status</th></tr></thead>
+          <tbody id="hero-rows">
+            <tr class="yours" id="your-row" hidden><td class="place"><span class="flap" id="yr-place"></span></td><td class="state-col" id="yr-state"></td><td class="when" id="yr-when"></td><td id="yr-status"></td></tr>
+            <tr><td class="place"><span class="flap">Reading the latest notices</span></td><td class="state-col"></td><td class="when"></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="hero-result" class="hero-result" hidden></div>
+      <dl class="board-key" aria-label="What each status means">
+        <div><dt><span class="key-tile status-open">Vaccine window open</span></dt><dd>The MMR vaccine can still prevent measles. Open for 72 hours after the exposure.</dd></div>
+        <div><dt><span class="key-tile status-watch">Immune globulin open</span></dt><dd>An antibody shot for babies, pregnant people and people with weak immune systems. Open for 6 days.</dd></div>
+        <div><dt><span class="key-tile status-watch">Watch for symptoms</span></dt><dd>Both windows have closed. Watch for fever and rash for 21 days, and call before you go in.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 2. The finding -->
+  <section class="finding" aria-labelledby="finding-h">
+    <div class="wrap split">
+      <div class="span-5">
+        <h2 id="finding-h" class="reveal">Notices arrive late</h2>
+        <p class="lead reveal" data-d="1">On Sunday, September 13, someone with measles spent the evening in Terminals B and F at Philadelphia International Airport. The notice went up on September 19.</p>
+        <p class="reveal" data-d="2">By then the 72-hour window for the vaccine had closed. For babies and pregnant travellers, a few hours remained for immune globulin. That is not one slow department. It is how notices work: someone gets sick, a test comes back, the health department traces where they went, then it publishes.</p>
+      </div>
+      <div class="span-7 stat-col">
+        <p class="big-stat reveal" data-d="1"><span class="num" data-stat="lag">5.2</span><span class="unit"> days</span></p>
+        <p class="stat-label reveal" data-d="2">Median time from a measles exposure to its public notice, across <span class="num" data-stat="samples">70</span> exposures from dated health department press releases <span data-info-for="lag"></span></p>
+        <div class="stat-pair reveal" data-d="3">
+          <p><span class="mid-stat num" data-stat="mmrClosed">56 of 68</span> notices went up after the 72-hour vaccine window had closed.</p>
+          <p><span class="mid-stat num" data-stat="igClosed">30 of 68</span> went up after the 6-day immune globulin window had closed too.</p>
+        </div>
+      </div>
+      <figure class="span-12 lag-figure reveal">
+        <div id="lag-chart" class="lag-chart" role="img" aria-label="Each exposure as a line from the day of exposure to the day its notice was published."></div>
+        <figcaption class="small">Each line is one exposure, from the day it happened to the day its notice was published. Lines that cross the first mark were published after the 72-hour vaccine window closed; lines that cross the second, after the 6-day immune globulin window. Measured live from the notices Seventy-Two reads. <a href="/learn/#lag">How we measure it</a>.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 3. What it does for you -->
+  <section class="field-band does" aria-labelledby="does-h">
+    <div class="wrap split">
+      <div class="span-5">
+        <h2 id="does-h" class="reveal">So every hour counts</h2>
+        <p class="reveal" data-d="1">Seventy-Two reads each notice within about 30 minutes of it going up, checks it against where you were, and turns it into what matters to you: what is still open, until when, and who to call.</p>
+        <p class="reveal" data-d="2"><a class="btn" href="/check/">Check where you were</a></p>
+      </div>
+      <div class="span-7">
+        <article class="result sample reveal" data-d="1" data-ui aria-label="An example result">
+          <p class="small">Example, from the real Philadelphia notice, as it would have read on September 19</p>
+          <h3>Philadelphia International Airport, Terminals B and F</h3>
+          <p class="when">Sunday, Sept 13, 7:25 PM to Monday 12:05 AM EDT</p>
+          <div class="deadline-grid">
+            <div class="deadline closed"><div class="label">MMR vaccine <span data-info-for="mmr-window"></span></div><div class="value">Closed</div><div class="sub">Wed Sept 16, 8:00 PM</div></div>
+            <div class="deadline open urgent"><div class="label">Immune globulin <span data-info-for="ig-window"></span></div><div class="value">8 h left</div><div class="sub">Sat Sept 19, 8:00 PM</div></div>
+            <div class="deadline open"><div class="label">Watch for symptoms <span data-info-for="watch"></span></div><div class="value">To Oct 5</div><div class="sub">Starts Fri Sept 18</div></div>
+          </div>
+          <p class="product-line">You were at Terminal B on the 13th. If you are pregnant, have a baby with you, or have a weak immune system, call your doctor today about immune globulin. Everyone else: watch for symptoms until October 5, and call before you go in.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. How it works -->
+  <section class="how" aria-labelledby="how-h">
+    <div class="wrap">
+      <div class="split">
+        <div class="span-6">
+          <h2 id="how-h" class="reveal">Scattered notices, one clock</h2>
+          <p class="reveal" data-d="1">Every health department posts its own notices: a press release here, a list page there. Seventy-Two reads them all and keeps the one that matters to you running as a clock.</p>
+        </div>
+        <figure class="span-6 how-photo reveal" data-d="1">
+          <img src="/assets/board.jpg" width="1800" height="1200" alt="A split-flap departures board at Melbourne Airport listing flights and times" loading="lazy">
+          <figcaption class="small">The board we borrowed the idea from: places, times, status.</figcaption>
+        </figure>
+      </div>
+      <ol class="how-steps">
+        <li class="reveal"><h3>Read</h3><p>Every 30 minutes, AWS Step Functions fetches every health department page we watch. Claude reads each new notice and copies out the places and hours, each with the exact words it came from. Code checks every one before it is kept. <span data-info-for="reader"></span></p></li>
+        <li class="reveal" data-d="1"><h3>Match</h3><p>You say where you were in your own words. Claude turns that into places and times. Code then decides whether your hours overlap a notice's hours and works out your deadlines from the CDC's rules. <span data-info-for="match"></span></p></li>
+        <li class="reveal" data-d="2"><h3>Remind</h3><p>Start your clock and a workflow of your own waits for each deadline, reminds you before it, and stops when you tell it you acted. Add it to your calendar and it reminds you even if you never come back. <span data-info-for="clock"></span></p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 5. History -->
+  <section class="field-band history" aria-labelledby="hist-h">
+    <div class="wrap split">
+      <figure class="span-3 reveal">
+        <img src="/assets/poster-cdc.jpg" width="900" height="1375" alt="A CDC poster: the word Measles crossed out over a map of the United States, with the words Keep Measles a Memory, Immunize" loading="lazy">
+        <figcaption class="small">A CDC campaign poster. In 2000 the United States declared measles eliminated.</figcaption>
+      </figure>
+      <div class="span-5 history-copy">
+        <h2 id="hist-h" class="reveal">Not a memory anymore</h2>
+        <p class="lead reveal" data-d="1">This week the United States lost its measles elimination status, after 26 years.</p>
+        <p class="reveal" data-d="2">2026 has had more than 5,000 confirmed cases in 45 states, the most since 1991. Measles spreads through the air and lingers for up to two hours after an infected person leaves. That is why airports, emergency rooms and stores keep turning up in notices.</p>
+      </div>
+      <figure class="span-4 reveal" data-d="1">
+        <img src="/assets/poster-1939.jpg" width="1024" height="855" alt="A 1939 health education bulletin board headed Prevent Measles, warning that complications may develop and are often fatal" loading="lazy">
+        <figcaption class="small">A health education board from February 1939.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 6. Bring your own -->
+  <section class="byo" aria-labelledby="byo-h">
+    <div class="wrap">
+      <div class="split">
+        <div class="span-6">
+          <h2 id="byo-h" class="reveal">Bring your own</h2>
+          <p class="statement reveal" data-d="1">Test it on your own trip, or on any notice you find.</p>
+          <p class="reveal" data-d="2">Everything you bring is read the same way as the live board. Nothing you paste is shown to anyone else, and it deletes itself within a day.</p>
+        </div>
+        <ul class="paths span-6">
+          <li class="reveal"><a href="/lab/"><strong>The Lab</strong><span>Paste a measles notice or a link, and watch it being read live.</span></a> <span data-info-for="lab"></span></li>
+          <li class="reveal" data-d="1"><a href="/check/"><strong>Your trip</strong><span>Describe where you were in your own words.</span></a></li>
+          <li class="reveal" data-d="2"><a href="/check/?replay=phl"><strong>Replay</strong><span>Step into a real 2026 exposure on the day its notice went up.</span></a> <span data-info-for="replay"></span></li>
+          <li class="reveal" data-d="3"><a href="/board/"><strong>The board</strong><span>Every exposure window we are watching, with live source status.</span></a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Questions -->
+  <section class="faq" aria-labelledby="faq-h">
+    <div class="wrap">
+      <div class="split">
+      <div class="span-4"><h2 id="faq-h" class="reveal">Questions</h2><p class="reveal" data-d="1">Short answers. Every one points to its source.</p></div>
+      <div class="cards span-8">
+        <details class="card" open><summary><span class="tab">Medical</span>Is this medical advice?</summary><p>No. It shows what health departments have published and the CDC's timing rules. Your doctor or health department decides what you should do. When in doubt, call them, and call before you go in so they can protect others.</p></details>
+        <details class="card"><summary><span class="tab">Vaccinated</span>I had MMR as a child. Do I need to do anything?</summary><p>Written proof of two MMR doses, a blood test showing immunity, or being born before 1957 usually means you are protected. You do not need the vaccine after an exposure. Still watch for fever and rash for 21 days. <button type="button" class="info" data-info="protected" aria-label="About being protected">i</button></p></details>
+        <details class="card"><summary><span class="tab">Missed it</span>My 72 hours have passed. Now what?</summary><p>Immune globulin can still help for up to 6 days, mainly for babies, pregnant people and people with weak immune systems. After that, watch for symptoms until day 21 and call before going in if any start.</p></details>
+        <details class="card"><summary><span class="tab">Data</span>Where do the notices come from?</summary><p>Only from health departments' own published pages. Every window links to the original notice and quotes the exact words it came from. If a notice does not give clock times, we say so and never guess.</p></details>
+        <details class="card"><summary><span class="tab">Privacy</span>What do you keep about me?</summary><p>Only what you type, and only while it can still matter. Clocks delete themselves the day after your watch ends. Things you paste into the Lab delete themselves within a day. No accounts, no tracking, no location.</p></details>
+        <details class="card"><summary><span class="tab">Coverage</span>Do you cover every health department?</summary><p>Not yet. We read <span class="num" data-stat="sources">27</span> pages from <span class="num" data-stat="issuers">12</span> health departments in <span class="num" data-stat="states">9</span> states, and the list is growing. If your notice is not here, paste it into the Lab.</p></details>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. For engineers -->
+  <section class="field-band built" aria-labelledby="built-h">
+    <div class="wrap split">
+      <div class="span-5">
+        <h2 id="built-h" class="reveal">Nothing to look after</h2>
+        <p class="reveal" data-d="1">Seventy-Two is built entirely from serverless AWS services. No servers, no deployment pipeline. It reads the news on a schedule, and each person's clock is its own Step Functions workflow that costs nothing while it waits. <span data-info-for="serverless"></span></p>
+        <p class="reveal" data-d="2"><a href="/learn/#built">How it is built, step by step</a><br><a href="/stack/">Every service, model, library and tool</a></p>
+      </div>
+      <ul class="service-list span-7">
+        <li class="reveal">EventBridge Scheduler starts a read every 30 minutes <span data-info-for="scheduler"></span></li>
+        <li class="reveal">Step Functions reads every source in parallel, and runs one clock per person <span data-info-for="step-functions"></span></li>
+        <li class="reveal">Lambda fetches pages, reads them and answers checks <span data-info-for="lambda"></span></li>
+        <li class="reveal">Bedrock runs Claude Haiku, which reads notices and trips <span data-info-for="bedrock"></span></li>
+        <li class="reveal">DynamoDB holds windows, saved trips and clocks, and deletes them on schedule <span data-info-for="dynamodb"></span></li>
+        <li class="reveal">DynamoDB Streams sends each new window to every saved trip, the moment it is stored <span data-info-for="streams"></span></li>
+        <li class="reveal">S3 keeps every notice we read, and a backup of the board <span data-info-for="s3"></span></li>
+        <li class="reveal">API Gateway and CloudFront serve the site and fail over to S3 <span data-info-for="cloudfront"></span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 9. Close -->
+  <section class="close-cta" aria-labelledby="close-h">
+    <div class="close-photo"><img src="/assets/terminal-night.jpg" width="1800" height="1062" alt="Oslo Airport terminal lit up at dusk, with aircraft at the gates" loading="lazy"></div>
+    <div class="wrap close-copy">
+      <h2 id="close-h" class="reveal">Check before it closes</h2>
+      <p class="reveal" data-d="1">The sooner you check, the more of your window is left.</p>
+      <p class="reveal key-fact" data-d="2">MMR within 72 hours. Immune globulin within 6 days.</p>
+      <p class="reveal" data-d="3"><a class="btn" href="/check/">Check where you were</a></p>
+    </div>
+  </section>
+</main>

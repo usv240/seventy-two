@@ -1,0 +1,794 @@
+[
+ {
+  "drill": "trip",
+  "at": "2026-11-14T20:56:19Z",
+  "passed": true,
+  "seconds_from_write_to_match": 5.3,
+  "matcher_reported_seconds": 5.5,
+  "status_shown": "mmr_open",
+  "trip_page": "deleted after the drill"
+ },
+ {
+  "drill": "failover",
+  "at": "2026-11-14T20:56:44Z",
+  "passed": true,
+  "api_direct_status": 503,
+  "through_cloudfront_status": 200,
+  "served_from": "S3 snapshot",
+  "rows_from_api_before": 20,
+  "rows_from_snapshot": 20,
+  "rows_from_api_after": 20,
+  "response_ms": 267
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-14T21:19:33Z",
+  "passed": true,
+  "seconds_from_write_to_match": 4.3,
+  "matcher_reported_seconds": 5.8,
+  "status_shown": "mmr_open",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=2ab23f5c9d174fc885cd8cf6"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-14T21:26:46Z",
+  "passed": true,
+  "seconds_from_write_to_match": 5.3,
+  "matcher_reported_seconds": 5.2,
+  "status_shown": "mmr_open",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=2e6164d347e84ce3be79ab7a"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-14T21:40:51Z",
+  "passed": true,
+  "seconds_from_write_to_match": 4.3,
+  "matcher_reported_seconds": 5.7,
+  "status_shown": "mmr_open",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=5697bbb04560433fb80aab73"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-14T21:47:52Z",
+  "passed": true,
+  "seconds_from_write_to_match": 5.4,
+  "matcher_reported_seconds": 6.3,
+  "status_shown": "mmr_open",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=c1492b0f168346be8970ed1c"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-14T22:30:13Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00315,
+  "seconds_to_read": 6.7,
+  "seconds_from_read_to_match": 3.9,
+  "seconds_total": 10.6,
+  "quote": "Friday, November 13, 2026: Drill Hall, 1 Test Street, Testville, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "trip_page": "deleted after the drill"
+ },
+ {
+  "drill": "failover",
+  "at": "2026-11-14T22:30:39Z",
+  "passed": true,
+  "api_direct_status": 503,
+  "through_cloudfront_status": 200,
+  "served_from": "S3 snapshot",
+  "rows_from_api_before": 20,
+  "rows_from_snapshot": 20,
+  "rows_from_api_after": 20,
+  "response_ms": 159,
+  "direct_call_without_cloudfront": 403
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-14T22:54:35Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00321,
+  "seconds_to_read": 6.0,
+  "seconds_from_read_to_match": 4.4,
+  "seconds_total": 10.4,
+  "quote": "Drill Hall, 1 Test Street, Testville, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=4082fd3024894f97a06639c6"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-14T23:22:10Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00314,
+  "seconds_to_read": 6.6,
+  "seconds_from_read_to_match": 4.5,
+  "seconds_total": 11.1,
+  "quote": "Friday, November 13, 2026: Drill Hall, 1 Test Street, Testville, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "trip_page": "deleted after the drill"
+ },
+ {
+  "drill": "failover",
+  "at": "2026-11-14T23:22:32Z",
+  "passed": true,
+  "api_direct_status": 503,
+  "through_cloudfront_status": 200,
+  "served_from": "S3 snapshot",
+  "rows_from_api_before": 20,
+  "rows_from_snapshot": 20,
+  "rows_from_api_after": 20,
+  "response_ms": 184,
+  "direct_call_without_cloudfront": 403
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-14T23:42:56Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00314,
+  "seconds_to_read": 2.3,
+  "seconds_from_read_to_match": 5.7,
+  "seconds_total": 8.0,
+  "quote": "Friday, November 13, 2026: Drill Hall, 1 Test Street, Testville, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=21ba1fc1887c45818159a3b2"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-14T23:48:37Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00324,
+  "seconds_to_read": 2.2,
+  "seconds_from_read_to_match": 1.3,
+  "seconds_total": 3.5,
+  "quote": "Friday, November 13, 2026: Drill Hall, 1 Test Street, Testville, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=3f619b83f3b54303ae4435b3"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-14T23:54:53Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00324,
+  "seconds_to_read": 2.8,
+  "seconds_from_read_to_match": 6.7,
+  "seconds_total": 9.5,
+  "quote": "Friday, November 13, 2026: Drill Hall, 1 Test Street, Testville, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=ebca7a8e08ac47549957bb8d"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T00:32:48Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00314,
+  "seconds_to_read": 5.4,
+  "seconds_from_read_to_match": 5.0,
+  "seconds_total": 10.4,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "deleted after the drill"
+ },
+ {
+  "drill": "failover",
+  "at": "2026-11-15T00:33:08Z",
+  "passed": true,
+  "api_direct_status": 503,
+  "through_cloudfront_status": 200,
+  "served_from": "S3 snapshot",
+  "rows_from_api_before": 20,
+  "rows_from_snapshot": 20,
+  "rows_from_api_after": 20,
+  "response_ms": 201,
+  "direct_call_without_cloudfront": 403
+ },
+ {
+  "drill": "clock",
+  "at": "2026-11-15T00:36:22Z",
+  "passed": false,
+  "speed": "real (1 second is 1 second)",
+  "immune_globulin_deadline": "2026-11-15T00:36:18Z",
+  "window_closed_at": "2026-11-15T00:36:17Z",
+  "seconds_after_deadline": -1.2,
+  "how": "the task token's timeout, caught as States.Timeout; nobody pressed anything",
+  "events": [
+   "watch_start",
+   "ig_reminder",
+   "ig_waiting",
+   "ig_closed"
+  ]
+ },
+ {
+  "drill": "clock",
+  "at": "2026-11-15T00:43:52Z",
+  "passed": true,
+  "speed": "real (1 second is 1 second)",
+  "immune_globulin_deadline": "2026-11-15T00:43:49Z",
+  "window_closed_at": "2026-11-15T00:43:49Z",
+  "seconds_after_deadline": 0.0,
+  "how": "the task token's timeout, caught as States.Timeout; nobody pressed anything",
+  "events": [
+   "ig_reminder",
+   "watch_start",
+   "ig_waiting",
+   "ig_closed"
+  ]
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T00:53:48Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00337,
+  "seconds_to_read": 5.6,
+  "seconds_from_read_to_match": 6.3,
+  "seconds_total": 11.9,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "deleted after the drill"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T00:54:17Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00319,
+  "seconds_to_read": 2.0,
+  "seconds_from_read_to_match": 0.6,
+  "seconds_total": 2.6,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "deleted after the drill"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T00:57:17Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00337,
+  "seconds_to_read": 2.1,
+  "seconds_from_read_to_match": 1.1,
+  "seconds_total": 3.2,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=1e40d143b45a430f8da32d74"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T01:30:43Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00333,
+  "seconds_to_read": 6.4,
+  "seconds_from_read_to_match": 5.0,
+  "seconds_total": 11.4,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": [
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   }
+  ],
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=9a6fe785a623435db8abf5b7"
+ },
+ {
+  "drill": "failover",
+  "at": "2026-11-15T01:32:06Z",
+  "passed": true,
+  "api_direct_status": 503,
+  "through_cloudfront_status": 200,
+  "served_from": "S3 snapshot",
+  "rows_from_api_before": 20,
+  "rows_from_snapshot": 20,
+  "rows_from_api_after": 20,
+  "response_ms": 199,
+  "direct_call_without_cloudfront": 403
+ },
+ {
+  "drill": "clock",
+  "at": "2026-11-15T01:35:20Z",
+  "passed": true,
+  "speed": "real (1 second is 1 second)",
+  "immune_globulin_deadline": "2026-11-15T01:35:16Z",
+  "window_closed_at": "2026-11-15T01:35:17Z",
+  "seconds_after_deadline": 1.0,
+  "how": "the task token's timeout, caught as States.Timeout; nobody pressed anything",
+  "events": [
+   "ig_reminder",
+   "watch_start",
+   "ig_waiting",
+   "ig_closed"
+  ]
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T01:42:45Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00319,
+  "seconds_to_read": 2.4,
+  "seconds_from_read_to_match": 5.0,
+  "seconds_total": 7.4,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": [
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   }
+  ],
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=845a7841841649fcabd6a747"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T02:02:58Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00319,
+  "seconds_to_read": 5.5,
+  "seconds_from_read_to_match": 5.1,
+  "seconds_total": 10.6,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "deleted after the drill"
+ },
+ {
+  "drill": "failover",
+  "at": "2026-11-15T02:03:19Z",
+  "passed": true,
+  "api_direct_status": 503,
+  "through_cloudfront_status": 200,
+  "served_from": "S3 snapshot",
+  "rows_from_api_before": 20,
+  "rows_from_snapshot": 20,
+  "rows_from_api_after": 20,
+  "response_ms": 150,
+  "direct_call_without_cloudfront": 403
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T02:07:42Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00336,
+  "seconds_to_read": 2.0,
+  "seconds_from_read_to_match": 0.6,
+  "seconds_total": 2.6,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "deleted after the drill"
+ },
+ {
+  "drill": "failover",
+  "at": "2026-11-15T02:08:03Z",
+  "passed": true,
+  "api_direct_status": 503,
+  "through_cloudfront_status": 200,
+  "served_from": "S3 snapshot",
+  "rows_from_api_before": 20,
+  "rows_from_snapshot": 20,
+  "rows_from_api_after": 20,
+  "response_ms": 162,
+  "direct_call_without_cloudfront": 403
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T02:20:14Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00326,
+  "seconds_to_read": 2.3,
+  "seconds_from_read_to_match": 6.7,
+  "seconds_total": 9.0,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": [
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   },
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   },
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   }
+  ],
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=ae1295e462b340ada4733bac"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T02:30:00Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00327,
+  "seconds_to_read": 4.2,
+  "seconds_from_read_to_match": 5.3,
+  "seconds_total": 9.5,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": [
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   },
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   },
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   },
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   }
+  ],
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=4e512395f37a454f93d3b16f"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T05:58:33Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00326,
+  "seconds_to_read": 6.4,
+  "seconds_from_read_to_match": 2.9,
+  "seconds_total": 9.3,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": [
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   }
+  ],
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=e8bf36d53e704ab8a32ba4fa"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T06:06:33Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00333,
+  "seconds_to_read": 5.0,
+  "seconds_from_read_to_match": 4.8,
+  "seconds_total": 9.8,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": [
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   }
+  ],
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=a389c0186d1a426190ea3e72"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T07:15:16Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00333,
+  "seconds_to_read": 2.6,
+  "seconds_from_read_to_match": 4.6,
+  "seconds_total": 7.2,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": [
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   },
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   },
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   },
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   }
+  ],
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=ef70078da01c427d8691d4de"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T07:22:50Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.0033,
+  "seconds_to_read": 2.1,
+  "seconds_from_read_to_match": 3.9,
+  "seconds_total": 6.0,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=8248f955426441a2be083988"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T07:45:19Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00333,
+  "seconds_to_read": 2.3,
+  "seconds_from_read_to_match": 0.5,
+  "seconds_total": 2.8,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=cecffb5f7dae4995bd9bef51"
+ },
+ {
+  "drill": "clock",
+  "at": "2026-11-15T08:21:25Z",
+  "passed": true,
+  "speed": "real (1 second is 1 second)",
+  "immune_globulin_deadline": "2026-11-15T08:21:21Z",
+  "window_closed_at": "2026-11-15T08:21:21Z",
+  "seconds_after_deadline": 0.0,
+  "how": "the task token's timeout, caught as States.Timeout; nobody pressed anything",
+  "events": [
+   "watch_start",
+   "ig_reminder",
+   "ig_waiting",
+   "ig_closed"
+  ],
+  "deadline_slip_ms_from_clock_log": 416,
+  "note": "the first real-speed clock drill to run with the timeout measured after the reminder (clock.seconds_left)"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T08:28:18Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00319,
+  "seconds_to_read": 5.4,
+  "seconds_from_read_to_match": 4.8,
+  "seconds_total": 10.2,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=ca9e41f4ccf04cc99c6ce40a"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T08:35:05Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00326,
+  "seconds_to_read": 6.6,
+  "seconds_from_read_to_match": 5.6,
+  "seconds_total": 12.2,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=b4b10419d9764bec9d88ac83"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T08:38:38Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00326,
+  "seconds_to_read": 2.4,
+  "seconds_from_read_to_match": 0.7,
+  "seconds_total": 3.1,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=014aa900340b44ebaefd1d35"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T08:41:56Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00336,
+  "seconds_to_read": 2.1,
+  "seconds_from_read_to_match": 1.1,
+  "seconds_total": 3.2,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=c78a84a53b4140e6b979191f"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T09:16:25Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00326,
+  "seconds_to_read": 7.4,
+  "seconds_from_read_to_match": 1.6,
+  "seconds_total": 9.0,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=c8b1c5ba0c1e4913957230b8"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T09:22:22Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00318,
+  "seconds_to_read": 2.0,
+  "seconds_from_read_to_match": 2.1,
+  "seconds_total": 4.1,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=376aa87bdf1d4af28f0d9428"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T21:53:09Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00336,
+  "seconds_to_read": 8.5,
+  "seconds_from_read_to_match": 3.2,
+  "seconds_total": 11.7,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=a290f61bf31843558ef46c8c"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-15T22:03:21Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00319,
+  "seconds_to_read": 8.8,
+  "seconds_from_read_to_match": 2.9,
+  "seconds_total": 11.7,
+  "quote": "Saturday, November 14, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=9f9cd8fe3514459cbae42c1d"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-16T00:08:53Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00319,
+  "seconds_to_read": 7.6,
+  "seconds_from_read_to_match": 1.5,
+  "seconds_total": 9.1,
+  "quote": "Sunday, November 15, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": [
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   }
+  ],
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=e2cca44ab2f440a4a8071d55"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-16T06:12:58Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00335,
+  "seconds_to_read": 9.1,
+  "seconds_from_read_to_match": 1.9,
+  "seconds_total": 11.0,
+  "quote": "Sunday, November 15, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": "no device had turned alerts on for this drill trip",
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=6dc9f1d84a9640519c6cea43"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-16T06:21:11Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00336,
+  "seconds_to_read": 7.5,
+  "seconds_from_read_to_match": 1.3,
+  "seconds_total": 8.8,
+  "quote": "Sunday, November 15, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": [
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   }
+  ],
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=1e06a00b52a8451c94c40963"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-16T06:28:59Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00319,
+  "seconds_to_read": 8.6,
+  "seconds_from_read_to_match": 1.8,
+  "seconds_total": 10.4,
+  "quote": "Sunday, November 15, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": [
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   }
+  ],
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=ece3635a323044079ac3a090"
+ },
+ {
+  "drill": "trip",
+  "at": "2026-11-16T06:36:32Z",
+  "passed": true,
+  "path": "notice > ingest Lambda > Claude > checks > DynamoDB > Streams > matcher > trip",
+  "windows_read": 1,
+  "model_cost_usd": 0.00322,
+  "seconds_to_read": 8.4,
+  "seconds_from_read_to_match": 1.7,
+  "seconds_total": 10.1,
+  "quote": "Sunday, November 15, 2026: Drill Hall, 1 Test Street, Testville, IA, from 10 a.m. to 12 p.m.",
+  "status_shown": "mmr_open",
+  "push_service_replies": [
+   {
+    "push": "fcm.googleapis.com",
+    "status": 201
+   }
+  ],
+  "trip_page": "https://d2y9hj2jlfzcvd.cloudfront.net/watch/?id=c5b4024954c949fbaa46cf77"
+ }
+]

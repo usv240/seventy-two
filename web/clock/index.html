@@ -1,0 +1,50 @@
+<!-- page {"title": "Your clock | Seventy-Two", "description": "Your exposure clock: each prevention deadline and your symptom watch, run by a workflow of your own.", "nav": "check", "scripts": ["/assets/clock.js"]} -->
+<main id="main">
+  <div class="demo-banner" id="demo-banner" hidden>Demo clock: 1 hour runs as 1 second. <button type="button" class="info" data-info="demo-clock" aria-label="About the demo clock">i</button></div>
+  <section class="app-top">
+    <div class="wrap split">
+      <div class="span-7">
+        <h1 class="page-title">Your clock</h1>
+        <p class="lead" id="clock-place">Loading your clock.</p>
+        <p id="clock-when" class="muted"></p>
+      </div>
+      <div class="span-5 side-note">
+        <p>This clock is its own AWS Step Functions workflow. It waits for each deadline, reminds you before it, and stops when you tell it you acted. <span data-info-for="clock"></span></p>
+        <p class="small">It deletes itself the day after your watch ends. Keep this page's address to come back.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="app-body">
+    <div class="wrap">
+      <p class="next-step lead" id="next-step" aria-live="polite"></p>
+      <div class="deadline-grid big" id="deadlines"></div>
+      <div class="actions" id="clock-actions"></div>
+      <p class="hint" id="alerts-note" role="status" hidden></p>
+      <p class="error" id="clock-error" role="alert" hidden></p>
+    </div>
+  </section>
+
+  <section class="field-band">
+    <div class="wrap split">
+      <div class="span-4">
+        <h2 class="mini-head">The workflow, live</h2>
+        <p>Each row is a step in your workflow, read from AWS Step Functions as it runs. <span data-info-for="step-functions"></span></p>
+        <p class="small" id="exec-status"></p>
+      </div>
+      <div class="span-8 board">
+        <table>
+          <thead><tr><th scope="col" style="width:60%">Step</th><th scope="col">Status</th></tr></thead>
+          <tbody id="steps"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap split">
+      <div class="span-4"><h2 class="mini-head">What happened</h2></div>
+      <ol class="span-8 events" id="events"></ol>
+    </div>
+  </section>
+</main>
